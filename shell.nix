@@ -19,12 +19,20 @@ in mkShell {
     jdk8 gradle
   ];
 
-  shellHook = ''
+  shellHook = let
+    info = builtins.fromJSON (builtins.readFile "${builddata}/info.json");
+    ss = "${builddata}/bin/SpecialSource.jar";
+    ss2 = "${builddata}/bin/SpecialSource-2.jar";
+    mapPath = key: "${builddata}/mappings/${builtins.getAttr key info}";
+
+    classMap = "./jars/server-cl.jar";
+    memberMap = "./jars/server-m.jar";
+  in ''
     echo "Applying mappings"
 
     mkdir -p jars
-    ${jdk8}/bin/java -jar ${builddata}/bin/SpecialSource-2.jar map -i ${original} -m ${builddata}/mappings/bukkit-1.8.8-cl.csrg -o ./jars/server-cl.jar
-    ${jdk8}/bin/java -jar ${builddata}/bin/SpecialSource-2.jar map -i ./jars/server-cl.jar -m ${builddata}/mappings/bukkit-1.8.8-members.csrg -o ./jars/server-m.jar
-    ${jdk8}/bin/java -jar ${builddata}/bin/SpecialSource.jar --kill-lvt -i ./jars/server-m.jar --access-transformer ${builddata}/mappings/bukkit-1.8.8.at -m ${builddata}/mappings/package.srg -o ./jars/server-mapped.jar
+    ${jdk8}/bin/java -jar ${ss2} map -i ${original} -m ${mapPath "classMappings"} -o ${classMap}
+    ${jdk8}/bin/java -jar ${ss2} map -i ${classMap} -m ${mapPath "memberMappings"} -o ${memberMap}
+    ${jdk8}/bin/java -jar ${ss} --kill-lvt -i ${memberMap} --access-transformer ${mapPath "accessTransforms"} -m ${mapPath "packageMappings"} -o ./jars/server-mapped.jar
   '';
 }
