@@ -1,1 +1,5 @@
-jars/
+.gradle
+build
+
+jars
+src
