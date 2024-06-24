@@ -1,5 +1,6 @@
 plugins {
     java
+    id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 repositories {
@@ -26,5 +27,11 @@ java {
 tasks {
     test {
         useJUnitPlatform()
+    }
+}
+
+tasks.jar {
+    manifest {
+        attributes(mapOf("Manifest-Version" to "1.0", "Main-Class" to "net.minecraft.server.MinecraftServer"))
     }
 }
