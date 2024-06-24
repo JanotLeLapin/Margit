@@ -1,7 +1,8 @@
 { jdk8
 , jdk22
 , unzip
-, gradle
+, gnutar
+, git
 , fetchurl
 , fetchgit
 , stdenv
@@ -18,37 +19,43 @@
     hash = "sha256-ZHghwZUgx6N6FP2a4MKyQhI6ZvdkmHTPog5EgeVs+Xg=";
   };
 
-  mapped = let
+  decompiled = let
     info = builtins.fromJSON (builtins.readFile "${builddata}/info.json");
     ss = "${builddata}/bin/SpecialSource.jar";
     ss2 = "${builddata}/bin/SpecialSource-2.jar";
+    fernflower = "${builddata}/bin/fernflower.jar";
     mapPath = key: "${builddata}/mappings/${builtins.getAttr key info}";
   in stdenv.mkDerivation {
-    name = "mapped-jar";
+    name = "decompiled-jar";
     src = original;
     phases = [ "buildPhase" "installPhase" ];
-    buildInputs = [ jdk8 ];
+    buildInputs = [ jdk8 unzip gnutar ];
     buildPhase = ''
       java -jar ${ss2} map -i ${original} -m ${mapPath "classMappings"} -o server-cl.jar
       java -jar ${ss2} map -i server-cl.jar -m ${mapPath "memberMappings"} -o server-m.jar
       java -jar ${ss} --kill-lvt -i server-m.jar --access-transformer ${mapPath "accessTransforms"} -m ${mapPath "packageMappings"} -o server-mapped.jar
+
+      mkdir -p classes src/main/java
+      unzip server-mapped.jar "net/minecraft/server/*" -d classes
+      java -jar ${fernflower} -dgs=1 -hdc=0 -rbr=0 -asc=1 -udv=0 classes src/main/java
+      tar -czvf decompiled-jar.tar.gz src/main/java
     '';
     installPhase = ''
-      mv server-mapped.jar $out
+      mv decompiled-jar.tar.gz $out
     '';
   };
 in mkShell {
   buildInputs = [
-    jdk22 gradle
+    jdk22 git gnutar
   ];
 
-  shellHook = let
-    fernflower = "${builddata}/bin/fernflower.jar";
-  in ''
-    echo "decompiling"
-    mkdir -p src/main/java
-    mkdir -p classes
-    ${unzip}/bin/unzip ${mapped} "net/minecraft/server/*" -d classes
-    ${jdk8}/bin/java -jar ${fernflower} -dgs=1 -hdc=0 -rbr=0 -asc=1 -udv=0 classes src/main/java
+  shellHook = ''
+    rm -rf src
+    mkdir -p src
+    git -C src init
+
+    tar -xzvf ${decompiled}
+    git -C src add .
+    git -C src commit -m "initial commit"
   '';
 }
