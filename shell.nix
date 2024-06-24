@@ -39,7 +39,7 @@
   };
 in mkShell {
   buildInputs = [
-    jdk8 gradle
+    jdk22 gradle
   ];
 
   shellHook = let
