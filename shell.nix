@@ -4,6 +4,7 @@
 , gradle
 , fetchurl
 , fetchgit
+, stdenv
 , mkShell
 }: let
   original = fetchurl {
@@ -16,31 +17,38 @@
     rev = "838b40587fa7a68a130b75252959bc8a3481d94f";
     hash = "sha256-ZHghwZUgx6N6FP2a4MKyQhI6ZvdkmHTPog5EgeVs+Xg=";
   };
+
+  mapped = let
+    info = builtins.fromJSON (builtins.readFile "${builddata}/info.json");
+    ss = "${builddata}/bin/SpecialSource.jar";
+    ss2 = "${builddata}/bin/SpecialSource-2.jar";
+    mapPath = key: "${builddata}/mappings/${builtins.getAttr key info}";
+  in stdenv.mkDerivation {
+    name = "mapped-jar";
+    src = original;
+    phases = [ "buildPhase" "installPhase" ];
+    buildInputs = [ jdk8 ];
+    buildPhase = ''
+      java -jar ${ss2} map -i ${original} -m ${mapPath "classMappings"} -o server-cl.jar
+      java -jar ${ss2} map -i server-cl.jar -m ${mapPath "memberMappings"} -o server-m.jar
+      java -jar ${ss} --kill-lvt -i server-m.jar --access-transformer ${mapPath "accessTransforms"} -m ${mapPath "packageMappings"} -o server-mapped.jar
+    '';
+    installPhase = ''
+      mv server-mapped.jar $out
+    '';
+  };
 in mkShell {
   buildInputs = [
     jdk8 gradle
   ];
 
   shellHook = let
-    info = builtins.fromJSON (builtins.readFile "${builddata}/info.json");
-    ss = "${builddata}/bin/SpecialSource.jar";
-    ss2 = "${builddata}/bin/SpecialSource-2.jar";
     fernflower = "${builddata}/bin/fernflower.jar";
-    mapPath = key: "${builddata}/mappings/${builtins.getAttr key info}";
-
-    classMap = "./jars/server-cl.jar";
-    memberMap = "./jars/server-m.jar";
-    finalMap = "./jars/server-mapped.jar";
   in ''
-    echo "Applying mappings"
-
-    mkdir -p jars/classes
-    ${jdk8}/bin/java -jar ${ss2} map -i ${original} -m ${mapPath "classMappings"} -o ${classMap}
-    ${jdk8}/bin/java -jar ${ss2} map -i ${classMap} -m ${mapPath "memberMappings"} -o ${memberMap}
-    ${jdk8}/bin/java -jar ${ss} --kill-lvt -i ${memberMap} --access-transformer ${mapPath "accessTransforms"} -m ${mapPath "packageMappings"} -o ${finalMap}
-
+    echo "decompiling"
     mkdir -p src/main/java
-    ${unzip}/bin/unzip ${finalMap} "net/minecraft/server/*" -d jars/classes
-    ${jdk8}/bin/java -jar ${fernflower} -dgs=1 -hdc=0 -rbr=0 -asc=1 -udv=0 jars/classes src/main/java
+    mkdir -p classes
+    ${unzip}/bin/unzip ${mapped} "net/minecraft/server/*" -d classes
+    ${jdk8}/bin/java -jar ${fernflower} -dgs=1 -hdc=0 -rbr=0 -asc=1 -udv=0 classes src/main/java
   '';
 }
