@@ -1,5 +1,5 @@
 { jdk8
-, jdk22
+, jdt-language-server
 , unzip
 , gnutar
 , git
@@ -46,7 +46,7 @@
   };
 in mkShell {
   buildInputs = [
-    jdk22 git gnutar
+    jdk8 git gnutar jdt-language-server
   ];
 
   shellHook = ''
