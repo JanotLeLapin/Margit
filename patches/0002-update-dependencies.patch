@@ -1,0 +1,262 @@
+From bad63a782aa825acdf9240aeb710846e1889b4d6 Mon Sep 17 00:00:00 2001
+From: Joseph DALY <joseph300905@gmail.com>
+Date: Tue, 25 Jun 2024 12:28:46 +0200
+Subject: [PATCH] update dependencies
+
+---
+ .../net/minecraft/server/MinecraftServer.java |   2 +-
+ .../server/PacketDataSerializer.java          | 190 +++++++++++++++++-
+ 2 files changed, 187 insertions(+), 5 deletions(-)
+
+diff --git a/main/java/net/minecraft/server/MinecraftServer.java b/main/java/net/minecraft/server/MinecraftServer.java
+index 103533c..82c93ad 100644
+--- a/main/java/net/minecraft/server/MinecraftServer.java
++++ b/main/java/net/minecraft/server/MinecraftServer.java
+@@ -1194,7 +1194,7 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+             try {
+                 return Futures.immediateFuture(callable.call());
+             } catch (Exception exception) {
+-                return Futures.immediateFailedCheckedFuture(exception);
++                return Futures.immediateFailedFuture(exception);
+             }
+         }
+     }
+diff --git a/main/java/net/minecraft/server/PacketDataSerializer.java b/main/java/net/minecraft/server/PacketDataSerializer.java
+index 9a343d9..4463d6e 100644
+--- a/main/java/net/minecraft/server/PacketDataSerializer.java
++++ b/main/java/net/minecraft/server/PacketDataSerializer.java
+@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBufOutputStream;
+ import io.netty.buffer.ByteBufProcessor;
+ import io.netty.handler.codec.DecoderException;
+ import io.netty.handler.codec.EncoderException;
++import io.netty.util.ByteProcessor;
+ import io.netty.util.ReferenceCounted;
+ import java.io.DataInput;
+ import java.io.DataOutput;
+@@ -16,6 +17,7 @@ import java.io.InputStream;
+ import java.io.OutputStream;
+ import java.nio.ByteBuffer;
+ import java.nio.ByteOrder;
++import java.nio.channels.FileChannel;
+ import java.nio.channels.GatheringByteChannel;
+ import java.nio.channels.ScatteringByteChannel;
+ import java.nio.charset.Charset;
+@@ -540,6 +542,10 @@ public class PacketDataSerializer extends ByteBuf {
+         return this.a.readChar();
+     }
+ 
++    public CharSequence readCharSequence(int length, Charset charset) {
++        return this.a.readCharSequence(length, charset);
++    }
++
+     public float readFloat() {
+         return this.a.readFloat();
+     }
+@@ -680,19 +686,19 @@ public class PacketDataSerializer extends ByteBuf {
+         return this.a.bytesBefore(i, j, b0);
+     }
+ 
+-    public int forEachByte(ByteBufProcessor bytebufprocessor) {
++    public int forEachByte(ByteProcessor bytebufprocessor) {
+         return this.a.forEachByte(bytebufprocessor);
+     }
+ 
+-    public int forEachByte(int i, int j, ByteBufProcessor bytebufprocessor) {
++    public int forEachByte(int i, int j, ByteProcessor bytebufprocessor) {
+         return this.a.forEachByte(i, j, bytebufprocessor);
+     }
+ 
+-    public int forEachByteDesc(ByteBufProcessor bytebufprocessor) {
++    public int forEachByteDesc(ByteProcessor bytebufprocessor) {
+         return this.a.forEachByteDesc(bytebufprocessor);
+     }
+ 
+-    public int forEachByteDesc(int i, int j, ByteBufProcessor bytebufprocessor) {
++    public int forEachByteDesc(int i, int j, ByteProcessor bytebufprocessor) {
+         return this.a.forEachByteDesc(i, j, bytebufprocessor);
+     }
+ 
+@@ -803,4 +809,180 @@ public class PacketDataSerializer extends ByteBuf {
+     public boolean release(int i) {
+         return this.a.release(i);
+     }
++
++    public ByteBuf asReadOnly() {
++        return this.a.asReadOnly();
++    }
++
++    public int getBytes(int index, FileChannel out, long position, int length) throws IOException {
++        return this.a.getBytes(index, out, position, length);
++    }
++
++    public CharSequence getCharSequence(int index, int length, Charset charset) {
++        return this.a.getCharSequence(index, length, charset);
++    }
++
++    public double getDoubleLE(int index) {
++        return this.a.getDoubleLE(index);
++    }
++
++    public float getFloatLE(int index) {
++        return this.a.getFloatLE(index);
++    }
++
++    public int getIntLE(int index) {
++        return this.a.getIntLE(index);
++    }
++
++    public long getUnsignedIntLE(int index) {
++        return this.a.getUnsignedIntLE(index);
++    }
++
++    public long getLongLE(int index) {
++        return this.a.getLongLE(index);
++    }
++
++    public int getMediumLE(int index) {
++        return this.a.getMediumLE(index);
++    }
++
++    public int getUnsignedMediumLE(int index) {
++        return this.a.getUnsignedMediumLE(index);
++    }
++
++    public short getShortLE(int index) {
++        return this.a.getShortLE(index);
++    }
++
++    public int getUnsignedShortLE(int index) {
++        return this.a.getUnsignedShortLE(index);
++    }
++
++    public boolean isReadOnly() {
++        return this.a.isReadOnly();
++    }
++
++    public int readBytes(FileChannel channel, long position, int length) throws IOException {
++        return this.a.readBytes(channel, position, length);
++    }
++
++    public float readFloatLE() {
++        return this.readFloatLE();
++    }
++
++    public long readUnsignedIntLE() {
++        return this.readUnsignedIntLE();
++    }
++
++    public int readUnsignedMediumLE() {
++        return this.readUnsignedMediumLE();
++    }
++
++    public int readUnsignedShortLE() {
++        return this.readUnsignedShortLE();
++    }
++
++    public int readIntLE() {
++        return this.readIntLE();
++    }
++
++    public long readLongLE() {
++        return this.readLongLE();
++    }
++
++    public int readMediumLE() {
++        return this.readMediumLE();
++    }
++
++    public short readShortLE() {
++        return this.readShortLE();
++    }
++
++    public ByteBuf readRetainedSlice(int length) {
++        return this.a.readRetainedSlice(length);
++    }
++
++    public ByteBuf retainedSlice() {
++        return this.a.retainedSlice();
++    }
++
++    public ByteBuf retainedSlice(int i, int j) {
++        return this.a.retainedSlice(i, j);
++    }
++
++    public ByteBuf retainedDuplicate() {
++        return this.a.retainedDuplicate();
++    }
++
++    public ByteBuf setDoubleLE(int index, double value) {
++        return this.a.setDoubleLE(index, value);
++    }
++
++    public ByteBuf setFloatLE(int index, float value) {
++        return this.a.setFloatLE(index, value);
++    }
++
++    public ByteBuf setIntLE(int index, int value) {
++        return this.a.setIntLE(index, value);
++    }
++
++    public ByteBuf setLongLE(int index, long value) {
++        return this.a.setLongLE(index, value);
++    }
++
++    public ByteBuf setMediumLE(int index, int value) {
++        return this.a.setMediumLE(index, value);
++    }
++
++    public ByteBuf setShortLE(int index, int value) {
++        return this.a.setShortLE(index, value);
++    }
++
++    public int setBytes(int index, FileChannel in, long position, int length) throws IOException {
++        return this.a.setBytes(index, in, position, length);
++    }
++
++    public int setCharSequence(int index, CharSequence sequence, Charset charset) {
++        return this.a.setCharSequence(index, sequence, charset);
++    }
++
++    public ByteBuf touch() {
++        return this.a.touch();
++    }
++
++    public ByteBuf touch(Object hint) {
++        return this.a.touch(hint);
++    }
++
++    public int writeBytes(FileChannel in, long position, int length) throws IOException {
++        return this.a.writeBytes(in, position, length);
++    }
++
++    public int writeCharSequence(CharSequence sequence, Charset charset) {
++        return this.a.writeCharSequence(sequence, charset);
++    }
++
++    public ByteBuf writeDoubleLE(double d0) {
++        return this.a.writeDoubleLE(d0);
++    }
++
++    public ByteBuf writeFloatLE(float f) {
++        return this.a.writeFloatLE(f);
++    }
++
++    public ByteBuf writeIntLE(int i) {
++        return this.a.writeIntLE(i);
++    }
++
++    public ByteBuf writeLongLE(long i) {
++        return this.a.writeLongLE(i);
++    }
++
++    public ByteBuf writeMediumLE(int i) {
++        return this.a.writeMediumLE(i);
++    }
++
++    public ByteBuf writeShortLE(int i) {
++        return this.a.writeShortLE(i);
++    }
+ }
+-- 
+2.45.1
+
