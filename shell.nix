@@ -1,4 +1,5 @@
 { jdk8
+, jdk22
 , jdt-language-server
 , unzip
 , gnutar
@@ -31,7 +32,7 @@
   margit-decompiled-jar = callPackage ./decompile.nix { inherit margit-mapped-jar margit-build-data; };
 in mkShell {
   buildInputs = [
-    jdk8 git gnutar jdt-language-server
+    jdk22 git gnutar jdt-language-server
   ];
 
   shellHook = ''

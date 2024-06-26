@@ -14,14 +14,15 @@ dependencies {
     implementation("com.google.guava:guava:33.2.1-jre")
     implementation("io.netty:netty-all:4.1.111.Final")
     implementation("org.apache.commons:commons-lang3:3.14.0")
-    implementation("com.mojang:authlib:1.6.25")
+    implementation("commons-io:commons-io:2.16.1")
+    implementation("com.mojang:authlib:3.4.40")
     implementation("org.apache.logging.log4j:log4j-api:2.23.1")
     implementation("org.apache.logging.log4j:log4j-core:2.23.1")
 }
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
+        languageVersion = JavaLanguageVersion.of(22)
     }
 }
 

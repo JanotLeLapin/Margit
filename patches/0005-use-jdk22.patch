@@ -1,0 +1,856 @@
+From db4f6c4a89faeaea94fe03366d74b017fbf78876 Mon Sep 17 00:00:00 2001
+From: Joseph DALY <joseph300905@gmail.com>
+Date: Wed, 26 Jun 2024 12:28:46 +0200
+Subject: [PATCH] use jdk22
+
+---
+ main/java/net/minecraft/server/BiomeBase.java |  2 +-
+ main/java/net/minecraft/server/Chunk.java     |  2 +-
+ .../minecraft/server/ChunkProviderServer.java |  2 +-
+ .../minecraft/server/ChunkRegionLoader.java   |  2 +-
+ .../net/minecraft/server/CommandDebug.java    |  2 +-
+ .../net/minecraft/server/CommandHandler.java  |  2 +-
+ .../net/minecraft/server/CommandTitle.java    |  2 +-
+ .../net/minecraft/server/ContainerAnvil.java  |  2 +-
+ .../net/minecraft/server/CrashReport.java     |  2 +-
+ .../minecraft/server/DedicatedPlayerList.java |  2 +-
+ .../net/minecraft/server/DedicatedServer.java |  2 +-
+ .../minecraft/server/DispenserRegistry.java   |  2 +-
+ main/java/net/minecraft/server/EULA.java      |  2 +-
+ .../java/net/minecraft/server/EntityItem.java |  4 +--
+ .../net/minecraft/server/EntityPlayer.java    |  2 +-
+ .../net/minecraft/server/EntityTracker.java   |  2 +-
+ .../minecraft/server/EntityTrackerEntry.java  |  2 +-
+ .../net/minecraft/server/EntityTypes.java     |  2 +-
+ .../net/minecraft/server/EnumProtocol.java    |  2 +-
+ .../minecraft/server/GenLayerRegionHills.java |  2 +-
+ .../minecraft/server/GenericAttributes.java   |  2 +-
+ .../net/minecraft/server/HttpUtilities.java   |  2 +-
+ main/java/net/minecraft/server/JsonList.java  |  2 +-
+ .../minecraft/server/LegacyPingHandler.java   |  2 +-
+ .../net/minecraft/server/LocaleLanguage.java  | 27 ++++++++-----------
+ .../net/minecraft/server/LoginListener.java   |  2 +-
+ .../net/minecraft/server/MethodProfiler.java  |  2 +-
+ .../minecraft/server/MinecraftEncryption.java |  2 +-
+ .../net/minecraft/server/MinecraftServer.java |  5 +++-
+ main/java/net/minecraft/server/MobEffect.java |  2 +-
+ .../net/minecraft/server/MojangsonParser.java |  2 +-
+ .../java/net/minecraft/server/NBTTagList.java |  2 +-
+ .../server/NameReferencingFileConverter.java  |  2 +-
+ .../net/minecraft/server/NetworkManager.java  |  2 +-
+ .../net/minecraft/server/PacketDecoder.java   |  2 +-
+ .../net/minecraft/server/PacketEncoder.java   |  2 +-
+ ...GoalNearestAttackableTargetInsentient.java |  2 +-
+ .../server/PathfinderGoalSelector.java        |  2 +-
+ .../PathfinderGoalTargetNearestPlayer.java    |  2 +-
+ .../server/PersistentScoreboard.java          |  2 +-
+ .../net/minecraft/server/PlayerChunkMap.java  |  2 +-
+ .../minecraft/server/PlayerConnection.java    |  2 +-
+ .../java/net/minecraft/server/PlayerList.java |  2 +-
+ .../net/minecraft/server/PropertyManager.java |  2 +-
+ .../net/minecraft/server/RedirectStream.java  |  2 +-
+ .../net/minecraft/server/RegistrySimple.java  |  2 +-
+ .../server/RemoteControlSession.java          |  4 +--
+ .../minecraft/server/ServerConnection.java    |  2 +-
+ .../server/ServerStatisticManager.java        |  2 +-
+ .../net/minecraft/server/ThreadWatchdog.java  |  2 +-
+ .../java/net/minecraft/server/TileEntity.java |  2 +-
+ .../minecraft/server/WorldGenDungeons.java    |  2 +-
+ .../net/minecraft/server/WorldGenFactory.java |  2 +-
+ .../net/minecraft/server/WorldLoader.java     |  2 +-
+ .../minecraft/server/WorldLoaderServer.java   |  2 +-
+ .../net/minecraft/server/WorldNBTStorage.java |  2 +-
+ .../net/minecraft/server/WorldServer.java     |  2 +-
+ 57 files changed, 72 insertions(+), 74 deletions(-)
+
+diff --git a/main/java/net/minecraft/server/BiomeBase.java b/main/java/net/minecraft/server/BiomeBase.java
+index c01a400..2285ada 100644
+--- a/main/java/net/minecraft/server/BiomeBase.java
++++ b/main/java/net/minecraft/server/BiomeBase.java
+@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public abstract class BiomeBase {
+ 
+-    private static final Logger aD = LogManager.getLogger();
++    private static final Logger aD = LogManager.getLogger(BiomeBase.class);
+     protected static final BiomeBase.BiomeTemperature a = new BiomeBase.BiomeTemperature(0.1F, 0.2F);
+     protected static final BiomeBase.BiomeTemperature b = new BiomeBase.BiomeTemperature(-0.5F, 0.0F);
+     protected static final BiomeBase.BiomeTemperature c = new BiomeBase.BiomeTemperature(-1.0F, 0.1F);
+diff --git a/main/java/net/minecraft/server/Chunk.java b/main/java/net/minecraft/server/Chunk.java
+index 6633377..95e2ec3 100644
+--- a/main/java/net/minecraft/server/Chunk.java
++++ b/main/java/net/minecraft/server/Chunk.java
+@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class Chunk {
+ 
+-    private static final Logger c = LogManager.getLogger();
++    private static final Logger c = LogManager.getLogger(Chunk.class);
+     private final ChunkSection[] sections;
+     private final byte[] e;
+     private final int[] f;
+diff --git a/main/java/net/minecraft/server/ChunkProviderServer.java b/main/java/net/minecraft/server/ChunkProviderServer.java
+index 308f85e..cb41a1b 100644
+--- a/main/java/net/minecraft/server/ChunkProviderServer.java
++++ b/main/java/net/minecraft/server/ChunkProviderServer.java
+@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class ChunkProviderServer implements IChunkProvider {
+ 
+-    private static final Logger b = LogManager.getLogger();
++    private static final Logger b = LogManager.getLogger(ChunkProviderServer.class);
+     private Set<Long> unloadQueue = Collections.newSetFromMap(new ConcurrentHashMap());
+     public Chunk emptyChunk;
+     public IChunkProvider chunkProvider;
+diff --git a/main/java/net/minecraft/server/ChunkRegionLoader.java b/main/java/net/minecraft/server/ChunkRegionLoader.java
+index 194dd07..30531b8 100644
+--- a/main/java/net/minecraft/server/ChunkRegionLoader.java
++++ b/main/java/net/minecraft/server/ChunkRegionLoader.java
+@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class ChunkRegionLoader implements IChunkLoader, IAsyncChunkSaver {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(ChunkRegionLoader.class);
+     private Map<ChunkCoordIntPair, NBTTagCompound> b = new ConcurrentHashMap();
+     private Set<ChunkCoordIntPair> c = Collections.newSetFromMap(new ConcurrentHashMap());
+     private final File d;
+diff --git a/main/java/net/minecraft/server/CommandDebug.java b/main/java/net/minecraft/server/CommandDebug.java
+index 916298c..547f0bc 100644
+--- a/main/java/net/minecraft/server/CommandDebug.java
++++ b/main/java/net/minecraft/server/CommandDebug.java
+@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class CommandDebug extends CommandAbstract {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(CommandDebug.class);
+     private long b;
+     private int c;
+ 
+diff --git a/main/java/net/minecraft/server/CommandHandler.java b/main/java/net/minecraft/server/CommandHandler.java
+index f0c7e1f..fc40de4 100644
+--- a/main/java/net/minecraft/server/CommandHandler.java
++++ b/main/java/net/minecraft/server/CommandHandler.java
+@@ -14,7 +14,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class CommandHandler implements ICommandHandler {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(CommandHandler.class);
+     private final Map<String, ICommand> b = Maps.newHashMap();
+     private final Set<ICommand> c = Sets.newHashSet();
+ 
+diff --git a/main/java/net/minecraft/server/CommandTitle.java b/main/java/net/minecraft/server/CommandTitle.java
+index 74c40d8..1c96a32 100644
+--- a/main/java/net/minecraft/server/CommandTitle.java
++++ b/main/java/net/minecraft/server/CommandTitle.java
+@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class CommandTitle extends CommandAbstract {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(CommandTitle.class);
+ 
+     public CommandTitle() {}
+ 
+diff --git a/main/java/net/minecraft/server/ContainerAnvil.java b/main/java/net/minecraft/server/ContainerAnvil.java
+index 20aa918..9afacda 100644
+--- a/main/java/net/minecraft/server/ContainerAnvil.java
++++ b/main/java/net/minecraft/server/ContainerAnvil.java
+@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class ContainerAnvil extends Container {
+ 
+-    private static final Logger f = LogManager.getLogger();
++    private static final Logger f = LogManager.getLogger(ContainerAnvil.class);
+     private IInventory g = new InventoryCraftResult();
+     private IInventory h = new InventorySubcontainer("Repair", true, 2) {
+         public void update() {
+diff --git a/main/java/net/minecraft/server/CrashReport.java b/main/java/net/minecraft/server/CrashReport.java
+index cea2f4a..23aa232 100644
+--- a/main/java/net/minecraft/server/CrashReport.java
++++ b/main/java/net/minecraft/server/CrashReport.java
+@@ -19,7 +19,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class CrashReport {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(CrashReport.class);
+     private final String b;
+     private final Throwable c;
+     private final CrashReportSystemDetails d = new CrashReportSystemDetails(this, "System Details");
+diff --git a/main/java/net/minecraft/server/DedicatedPlayerList.java b/main/java/net/minecraft/server/DedicatedPlayerList.java
+index 75dc45f..8d437e2 100644
+--- a/main/java/net/minecraft/server/DedicatedPlayerList.java
++++ b/main/java/net/minecraft/server/DedicatedPlayerList.java
+@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class DedicatedPlayerList extends PlayerList {
+ 
+-    private static final Logger f = LogManager.getLogger();
++    private static final Logger f = LogManager.getLogger(DedicatedPlayerList.class);
+ 
+     public DedicatedPlayerList(DedicatedServer dedicatedserver) {
+         super(dedicatedserver);
+diff --git a/main/java/net/minecraft/server/DedicatedServer.java b/main/java/net/minecraft/server/DedicatedServer.java
+index 3eaea11..d8cd7db 100644
+--- a/main/java/net/minecraft/server/DedicatedServer.java
++++ b/main/java/net/minecraft/server/DedicatedServer.java
+@@ -17,7 +17,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class DedicatedServer extends MinecraftServer implements IMinecraftServer {
+ 
+-    private static final Logger LOGGER = LogManager.getLogger();
++    private static final Logger LOGGER = LogManager.getLogger(DedicatedServer.class);
+     private final List<ServerCommand> l = Collections.synchronizedList(Lists.newArrayList());
+     private RemoteStatusListener m;
+     private RemoteControlListener n;
+diff --git a/main/java/net/minecraft/server/DispenserRegistry.java b/main/java/net/minecraft/server/DispenserRegistry.java
+index 6bc2623..c4a5c29 100644
+--- a/main/java/net/minecraft/server/DispenserRegistry.java
++++ b/main/java/net/minecraft/server/DispenserRegistry.java
+@@ -11,7 +11,7 @@ public class DispenserRegistry {
+ 
+     private static final PrintStream a = System.out;
+     private static boolean b = false;
+-    private static final Logger c = LogManager.getLogger();
++    private static final Logger c = LogManager.getLogger(DispenserRegistry.class);
+ 
+     public static boolean a() {
+         return DispenserRegistry.b;
+diff --git a/main/java/net/minecraft/server/EULA.java b/main/java/net/minecraft/server/EULA.java
+index c872029..94bbe8a 100644
+--- a/main/java/net/minecraft/server/EULA.java
++++ b/main/java/net/minecraft/server/EULA.java
+@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class EULA {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(EULA.class);
+     private final File b;
+     private final boolean c;
+ 
+diff --git a/main/java/net/minecraft/server/EntityItem.java b/main/java/net/minecraft/server/EntityItem.java
+index 801b699..f01ad73 100644
+--- a/main/java/net/minecraft/server/EntityItem.java
++++ b/main/java/net/minecraft/server/EntityItem.java
+@@ -5,8 +5,8 @@ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class EntityItem extends Entity {
+-
+-    private static final Logger b = LogManager.getLogger();
++    
++    private static final Logger b = LogManager.getLogger(EntityItem.class);
+     private int age;
+     public int pickupDelay;
+     private int e;
+diff --git a/main/java/net/minecraft/server/EntityPlayer.java b/main/java/net/minecraft/server/EntityPlayer.java
+index 1c42d59..9a8ef9f 100644
+--- a/main/java/net/minecraft/server/EntityPlayer.java
++++ b/main/java/net/minecraft/server/EntityPlayer.java
+@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class EntityPlayer extends EntityHuman implements ICrafting {
+ 
+-    private static final Logger bH = LogManager.getLogger();
++    private static final Logger bH = LogManager.getLogger(EntityPlayer.class);
+     private String locale = "en_US";
+     public PlayerConnection playerConnection;
+     public final MinecraftServer server;
+diff --git a/main/java/net/minecraft/server/EntityTracker.java b/main/java/net/minecraft/server/EntityTracker.java
+index 8a1d587..0c0f88c 100644
+--- a/main/java/net/minecraft/server/EntityTracker.java
++++ b/main/java/net/minecraft/server/EntityTracker.java
+@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class EntityTracker {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(EntityTracker.class);
+     private final WorldServer world;
+     private Set<EntityTrackerEntry> c = Sets.newHashSet();
+     public IntHashMap<EntityTrackerEntry> trackedEntities = new IntHashMap();
+diff --git a/main/java/net/minecraft/server/EntityTrackerEntry.java b/main/java/net/minecraft/server/EntityTrackerEntry.java
+index 5518a15..2d6344b 100644
+--- a/main/java/net/minecraft/server/EntityTrackerEntry.java
++++ b/main/java/net/minecraft/server/EntityTrackerEntry.java
+@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class EntityTrackerEntry {
+ 
+-    private static final Logger p = LogManager.getLogger();
++    private static final Logger p = LogManager.getLogger(EntityTrackerEntry.class);
+     public Entity tracker;
+     public int b;
+     public int c;
+diff --git a/main/java/net/minecraft/server/EntityTypes.java b/main/java/net/minecraft/server/EntityTypes.java
+index 064d0b2..4f2d701 100644
+--- a/main/java/net/minecraft/server/EntityTypes.java
++++ b/main/java/net/minecraft/server/EntityTypes.java
+@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class EntityTypes {
+ 
+-    private static final Logger b = LogManager.getLogger();
++    private static final Logger b = LogManager.getLogger(EntityTypes.class);
+     private static final Map<String, Class<? extends Entity>> c = Maps.newHashMap();
+     private static final Map<Class<? extends Entity>, String> d = Maps.newHashMap();
+     private static final Map<Integer, Class<? extends Entity>> e = Maps.newHashMap();
+diff --git a/main/java/net/minecraft/server/EnumProtocol.java b/main/java/net/minecraft/server/EnumProtocol.java
+index 2b7db32..1ec39da 100644
+--- a/main/java/net/minecraft/server/EnumProtocol.java
++++ b/main/java/net/minecraft/server/EnumProtocol.java
+@@ -157,7 +157,7 @@ public enum EnumProtocol {
+         if (object.containsValue(oclass)) {
+             String s = enumprotocoldirection + " packet " + oclass + " is already known to ID " + object.inverse().get(oclass);
+ 
+-            LogManager.getLogger().fatal(s);
++            LogManager.getLogger(EnumProtocol.class).fatal(s);
+             throw new IllegalArgumentException(s);
+         } else {
+             object.put(Integer.valueOf(object.size()), oclass);
+diff --git a/main/java/net/minecraft/server/GenLayerRegionHills.java b/main/java/net/minecraft/server/GenLayerRegionHills.java
+index 5964c0b..b1607f1 100644
+--- a/main/java/net/minecraft/server/GenLayerRegionHills.java
++++ b/main/java/net/minecraft/server/GenLayerRegionHills.java
+@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class GenLayerRegionHills extends GenLayer {
+ 
+-    private static final Logger c = LogManager.getLogger();
++    private static final Logger c = LogManager.getLogger(GenLayerRegionHills.class);
+     private GenLayer d;
+ 
+     public GenLayerRegionHills(long i, GenLayer genlayer, GenLayer genlayer1) {
+diff --git a/main/java/net/minecraft/server/GenericAttributes.java b/main/java/net/minecraft/server/GenericAttributes.java
+index 3ed721a..b94e9f3 100644
+--- a/main/java/net/minecraft/server/GenericAttributes.java
++++ b/main/java/net/minecraft/server/GenericAttributes.java
+@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class GenericAttributes {
+ 
+-    private static final Logger f = LogManager.getLogger();
++    private static final Logger f = LogManager.getLogger(GenericAttributes.class);
+     public static final IAttribute maxHealth = (new AttributeRanged((IAttribute) null, "generic.maxHealth", 20.0D, 0.0D, 1024.0D)).a("Max Health").a(true);
+     public static final IAttribute FOLLOW_RANGE = (new AttributeRanged((IAttribute) null, "generic.followRange", 32.0D, 0.0D, 2048.0D)).a("Follow Range");
+     public static final IAttribute c = (new AttributeRanged((IAttribute) null, "generic.knockbackResistance", 0.0D, 0.0D, 1.0D)).a("Knockback Resistance");
+diff --git a/main/java/net/minecraft/server/HttpUtilities.java b/main/java/net/minecraft/server/HttpUtilities.java
+index 4132d8b..469683e 100644
+--- a/main/java/net/minecraft/server/HttpUtilities.java
++++ b/main/java/net/minecraft/server/HttpUtilities.java
+@@ -23,7 +23,7 @@ public class HttpUtilities {
+ 
+     public static final ListeningExecutorService a = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool((new ThreadFactoryBuilder()).setDaemon(true).setNameFormat("Downloader %d").build()));
+     private static final AtomicInteger b = new AtomicInteger(0);
+-    private static final Logger c = LogManager.getLogger();
++    private static final Logger c = LogManager.getLogger(HttpUtilities.class);
+ 
+     public static String a(Map<String, Object> map) {
+         StringBuilder stringbuilder = new StringBuilder();
+diff --git a/main/java/net/minecraft/server/JsonList.java b/main/java/net/minecraft/server/JsonList.java
+index d1e3aab..d2c319a 100644
+--- a/main/java/net/minecraft/server/JsonList.java
++++ b/main/java/net/minecraft/server/JsonList.java
+@@ -31,7 +31,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class JsonList<K, V extends JsonListEntry<K>> {
+ 
+-    protected static final Logger a = LogManager.getLogger();
++    protected static final Logger a = LogManager.getLogger(JsonList.class);
+     protected final Gson b;
+     private final File c;
+     private final Map<String, V> d = Maps.newHashMap();
+diff --git a/main/java/net/minecraft/server/LegacyPingHandler.java b/main/java/net/minecraft/server/LegacyPingHandler.java
+index a799066..4211470 100644
+--- a/main/java/net/minecraft/server/LegacyPingHandler.java
++++ b/main/java/net/minecraft/server/LegacyPingHandler.java
+@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class LegacyPingHandler extends ChannelInboundHandlerAdapter {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(LegacyPingHandler.class);
+     private ServerConnection b;
+ 
+     public LegacyPingHandler(ServerConnection serverconnection) {
+diff --git a/main/java/net/minecraft/server/LocaleLanguage.java b/main/java/net/minecraft/server/LocaleLanguage.java
+index 1af4090..7b46e65 100644
+--- a/main/java/net/minecraft/server/LocaleLanguage.java
++++ b/main/java/net/minecraft/server/LocaleLanguage.java
+@@ -21,30 +21,25 @@ public class LocaleLanguage {
+     private long e;
+ 
+     public LocaleLanguage() {
+-        try {
+-            InputStream inputstream = LocaleLanguage.class.getResourceAsStream("/assets/minecraft/lang/en_US.lang");
+-            Iterator iterator = IOUtils.readLines(inputstream, Charsets.UTF_8).iterator();
++        InputStream inputstream = LocaleLanguage.class.getResourceAsStream("/assets/minecraft/lang/en_US.lang");
++        Iterator iterator = IOUtils.readLines(inputstream, Charsets.UTF_8).iterator();
+ 
+-            while (iterator.hasNext()) {
+-                String s = (String) iterator.next();
++        while (iterator.hasNext()) {
++            String s = (String) iterator.next();
+ 
+-                if (!s.isEmpty() && s.charAt(0) != 35) {
+-                    String[] astring = (String[]) Iterables.toArray(LocaleLanguage.b.split(s), String.class);
++            if (!s.isEmpty() && s.charAt(0) != 35) {
++                String[] astring = (String[]) Iterables.toArray(LocaleLanguage.b.split(s), String.class);
+ 
+-                    if (astring != null && astring.length == 2) {
+-                        String s1 = astring[0];
+-                        String s2 = LocaleLanguage.a.matcher(astring[1]).replaceAll("%$1s");
++                if (astring != null && astring.length == 2) {
++                    String s1 = astring[0];
++                    String s2 = LocaleLanguage.a.matcher(astring[1]).replaceAll("%$1s");
+ 
+-                        this.d.put(s1, s2);
+-                    }
++                    this.d.put(s1, s2);
+                 }
+             }
+-
+-            this.e = System.currentTimeMillis();
+-        } catch (IOException ioexception) {
+-            ;
+         }
+ 
++        this.e = System.currentTimeMillis();
+     }
+ 
+     static LocaleLanguage a() {
+diff --git a/main/java/net/minecraft/server/LoginListener.java b/main/java/net/minecraft/server/LoginListener.java
+index a779e94..04e2eb0 100644
+--- a/main/java/net/minecraft/server/LoginListener.java
++++ b/main/java/net/minecraft/server/LoginListener.java
+@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
+ public class LoginListener implements PacketLoginInListener, IUpdatePlayerListBox {
+ 
+     private static final AtomicInteger b = new AtomicInteger(0);
+-    private static final Logger c = LogManager.getLogger();
++    private static final Logger c = LogManager.getLogger(LoginListener.class);
+     private static final Random random = new Random();
+     private final byte[] e = new byte[4];
+     private final MinecraftServer server;
+diff --git a/main/java/net/minecraft/server/MethodProfiler.java b/main/java/net/minecraft/server/MethodProfiler.java
+index 90f000a..1781402 100644
+--- a/main/java/net/minecraft/server/MethodProfiler.java
++++ b/main/java/net/minecraft/server/MethodProfiler.java
+@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class MethodProfiler {
+ 
+-    private static final Logger b = LogManager.getLogger();
++    private static final Logger b = LogManager.getLogger(MethodProfiler.class);
+     private final List<String> c = Lists.newArrayList();
+     private final List<Long> d = Lists.newArrayList();
+     public boolean a;
+diff --git a/main/java/net/minecraft/server/MinecraftEncryption.java b/main/java/net/minecraft/server/MinecraftEncryption.java
+index 74c50e7..117dc6e 100644
+--- a/main/java/net/minecraft/server/MinecraftEncryption.java
++++ b/main/java/net/minecraft/server/MinecraftEncryption.java
+@@ -25,7 +25,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class MinecraftEncryption {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(MinecraftEncryption.class);
+ 
+     public static KeyPair b() {
+         try {
+diff --git a/main/java/net/minecraft/server/MinecraftServer.java b/main/java/net/minecraft/server/MinecraftServer.java
+index 82c93ad..558d5b2 100644
+--- a/main/java/net/minecraft/server/MinecraftServer.java
++++ b/main/java/net/minecraft/server/MinecraftServer.java
+@@ -40,7 +40,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public abstract class MinecraftServer implements Runnable, ICommandListener, IAsyncTaskHandler, IMojangStatistics {
+ 
+-    public static final Logger LOGGER = LogManager.getLogger();
++    public static final Logger LOGGER = LogManager.getLogger(MinecraftServer.class);
+     public static final File a = new File("usercache.json");
+     private static MinecraftServer l;
+     public Convertable convertable;
+@@ -575,6 +575,9 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+     }
+ 
+     public static void main(String[] astring) {
++        System.out.println("Hello, World?");
++        LOGGER.info("Hello, World!");
++        
+         DispenserRegistry.c();
+ 
+         try {
+diff --git a/main/java/net/minecraft/server/MobEffect.java b/main/java/net/minecraft/server/MobEffect.java
+index c9f433f..81f20c8 100644
+--- a/main/java/net/minecraft/server/MobEffect.java
++++ b/main/java/net/minecraft/server/MobEffect.java
+@@ -5,7 +5,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class MobEffect {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(MobEffect.class);
+     private int effectId;
+     private int duration;
+     private int amplification;
+diff --git a/main/java/net/minecraft/server/MojangsonParser.java b/main/java/net/minecraft/server/MojangsonParser.java
+index 3378d7f..86488e6 100644
+--- a/main/java/net/minecraft/server/MojangsonParser.java
++++ b/main/java/net/minecraft/server/MojangsonParser.java
+@@ -12,7 +12,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class MojangsonParser {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(MojangsonParser.class);
+     private static final Pattern b = Pattern.compile("\\[[-+\\d|,\\s]+\\]");
+ 
+     public static NBTTagCompound parse(String s) throws MojangsonParseException {
+diff --git a/main/java/net/minecraft/server/NBTTagList.java b/main/java/net/minecraft/server/NBTTagList.java
+index 1c4f29d..be07595 100644
+--- a/main/java/net/minecraft/server/NBTTagList.java
++++ b/main/java/net/minecraft/server/NBTTagList.java
+@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class NBTTagList extends NBTBase {
+ 
+-    private static final Logger b = LogManager.getLogger();
++    private static final Logger b = LogManager.getLogger(NBTTagList.class);
+     private List<NBTBase> list = Lists.newArrayList();
+     private byte type = 0;
+ 
+diff --git a/main/java/net/minecraft/server/NameReferencingFileConverter.java b/main/java/net/minecraft/server/NameReferencingFileConverter.java
+index 8f53b99..51bd1d1 100644
+--- a/main/java/net/minecraft/server/NameReferencingFileConverter.java
++++ b/main/java/net/minecraft/server/NameReferencingFileConverter.java
+@@ -28,7 +28,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class NameReferencingFileConverter {
+ 
+-    private static final Logger e = LogManager.getLogger();
++    private static final Logger e = LogManager.getLogger(NameReferencingFileConverter.class);
+     public static final File a = new File("banned-ips.txt");
+     public static final File b = new File("banned-players.txt");
+     public static final File c = new File("ops.txt");
+diff --git a/main/java/net/minecraft/server/NetworkManager.java b/main/java/net/minecraft/server/NetworkManager.java
+index 592d012..b4d018c 100644
+--- a/main/java/net/minecraft/server/NetworkManager.java
++++ b/main/java/net/minecraft/server/NetworkManager.java
+@@ -29,7 +29,7 @@ import org.apache.logging.log4j.MarkerManager;
+ 
+ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
+ 
+-    private static final Logger g = LogManager.getLogger();
++    private static final Logger g = LogManager.getLogger(NetworkManager.class);
+     public static final Marker a = MarkerManager.getMarker("NETWORK");
+     public static final Marker b = MarkerManager.getMarker("NETWORK_PACKETS", NetworkManager.a);
+     public static final AttributeKey<EnumProtocol> c = AttributeKey.valueOf("protocol");
+diff --git a/main/java/net/minecraft/server/PacketDecoder.java b/main/java/net/minecraft/server/PacketDecoder.java
+index bbebe3a..2513261 100644
+--- a/main/java/net/minecraft/server/PacketDecoder.java
++++ b/main/java/net/minecraft/server/PacketDecoder.java
+@@ -12,7 +12,7 @@ import org.apache.logging.log4j.MarkerManager;
+ 
+ public class PacketDecoder extends ByteToMessageDecoder {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(PacketDecoder.class);
+     private static final Marker b = MarkerManager.getMarker("PACKET_RECEIVED", NetworkManager.b);
+     private final EnumProtocolDirection c;
+ 
+diff --git a/main/java/net/minecraft/server/PacketEncoder.java b/main/java/net/minecraft/server/PacketEncoder.java
+index 2b4da90..083d3e3 100644
+--- a/main/java/net/minecraft/server/PacketEncoder.java
++++ b/main/java/net/minecraft/server/PacketEncoder.java
+@@ -11,7 +11,7 @@ import org.apache.logging.log4j.MarkerManager;
+ 
+ public class PacketEncoder extends MessageToByteEncoder<Packet> {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(PacketEncoder.class);
+     private static final Marker b = MarkerManager.getMarker("PACKET_SENT", NetworkManager.b);
+     private final EnumProtocolDirection c;
+ 
+diff --git a/main/java/net/minecraft/server/PathfinderGoalNearestAttackableTargetInsentient.java b/main/java/net/minecraft/server/PathfinderGoalNearestAttackableTargetInsentient.java
+index cccde33..04b0776 100644
+--- a/main/java/net/minecraft/server/PathfinderGoalNearestAttackableTargetInsentient.java
++++ b/main/java/net/minecraft/server/PathfinderGoalNearestAttackableTargetInsentient.java
+@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class PathfinderGoalNearestAttackableTargetInsentient extends PathfinderGoal {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(PathfinderGoalNearestAttackableTargetInsentient.class);
+     private EntityInsentient b;
+     private final Predicate<EntityLiving> c;
+     private final PathfinderGoalNearestAttackableTarget.DistanceComparator d;
+diff --git a/main/java/net/minecraft/server/PathfinderGoalSelector.java b/main/java/net/minecraft/server/PathfinderGoalSelector.java
+index cb3b1b6..5f9bf72 100644
+--- a/main/java/net/minecraft/server/PathfinderGoalSelector.java
++++ b/main/java/net/minecraft/server/PathfinderGoalSelector.java
+@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class PathfinderGoalSelector {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(PathfinderGoalSelector.class);
+     private List<PathfinderGoalSelector.PathfinderGoalSelectorItem> b = Lists.newArrayList();
+     private List<PathfinderGoalSelector.PathfinderGoalSelectorItem> c = Lists.newArrayList();
+     private final MethodProfiler d;
+diff --git a/main/java/net/minecraft/server/PathfinderGoalTargetNearestPlayer.java b/main/java/net/minecraft/server/PathfinderGoalTargetNearestPlayer.java
+index a19493b..75d18d9 100644
+--- a/main/java/net/minecraft/server/PathfinderGoalTargetNearestPlayer.java
++++ b/main/java/net/minecraft/server/PathfinderGoalTargetNearestPlayer.java
+@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class PathfinderGoalTargetNearestPlayer extends PathfinderGoal {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(PathfinderGoalTargetNearestPlayer.class);
+     private EntityInsentient b;
+     private final Predicate<Entity> c;
+     private final PathfinderGoalNearestAttackableTarget.DistanceComparator d;
+diff --git a/main/java/net/minecraft/server/PersistentScoreboard.java b/main/java/net/minecraft/server/PersistentScoreboard.java
+index 370c1b3..fb54f5b 100644
+--- a/main/java/net/minecraft/server/PersistentScoreboard.java
++++ b/main/java/net/minecraft/server/PersistentScoreboard.java
+@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class PersistentScoreboard extends PersistentBase {
+ 
+-    private static final Logger b = LogManager.getLogger();
++    private static final Logger b = LogManager.getLogger(PersistentScoreboard.class);
+     private Scoreboard c;
+     private NBTTagCompound d;
+ 
+diff --git a/main/java/net/minecraft/server/PlayerChunkMap.java b/main/java/net/minecraft/server/PlayerChunkMap.java
+index ef37f55..86a2085 100644
+--- a/main/java/net/minecraft/server/PlayerChunkMap.java
++++ b/main/java/net/minecraft/server/PlayerChunkMap.java
+@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class PlayerChunkMap {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(PlayerChunkMap.class);
+     private final WorldServer world;
+     private final List<EntityPlayer> managedPlayers = Lists.newArrayList();
+     private final LongHashMap<PlayerChunkMap.PlayerChunk> d = new LongHashMap();
+diff --git a/main/java/net/minecraft/server/PlayerConnection.java b/main/java/net/minecraft/server/PlayerConnection.java
+index 9a647c0..4835986 100644
+--- a/main/java/net/minecraft/server/PlayerConnection.java
++++ b/main/java/net/minecraft/server/PlayerConnection.java
+@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class PlayerConnection implements PacketListenerPlayIn, IUpdatePlayerListBox {
+ 
+-    private static final Logger c = LogManager.getLogger();
++    private static final Logger c = LogManager.getLogger(PlayerConnection.class);
+     public final NetworkManager networkManager;
+     private final MinecraftServer minecraftServer;
+     public EntityPlayer player;
+diff --git a/main/java/net/minecraft/server/PlayerList.java b/main/java/net/minecraft/server/PlayerList.java
+index 479a4b2..56a534a 100644
+--- a/main/java/net/minecraft/server/PlayerList.java
++++ b/main/java/net/minecraft/server/PlayerList.java
+@@ -24,7 +24,7 @@ public abstract class PlayerList {
+     public static final File b = new File("banned-ips.json");
+     public static final File c = new File("ops.json");
+     public static final File d = new File("whitelist.json");
+-    private static final Logger f = LogManager.getLogger();
++    private static final Logger f = LogManager.getLogger(PlayerList.class);
+     private static final SimpleDateFormat g = new SimpleDateFormat("yyyy-MM-dd \'at\' HH:mm:ss z");
+     private final MinecraftServer server;
+     public final List<EntityPlayer> players = Lists.newArrayList();
+diff --git a/main/java/net/minecraft/server/PropertyManager.java b/main/java/net/minecraft/server/PropertyManager.java
+index 9600d92..ebaf136 100644
+--- a/main/java/net/minecraft/server/PropertyManager.java
++++ b/main/java/net/minecraft/server/PropertyManager.java
+@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class PropertyManager {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(PropertyManager.class);
+     public final Properties properties = new Properties();
+     private final File file;
+ 
+diff --git a/main/java/net/minecraft/server/RedirectStream.java b/main/java/net/minecraft/server/RedirectStream.java
+index 2bd51d5..f20875e 100644
+--- a/main/java/net/minecraft/server/RedirectStream.java
++++ b/main/java/net/minecraft/server/RedirectStream.java
+@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class RedirectStream extends PrintStream {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(RedirectStream.class);
+     private final String b;
+ 
+     public RedirectStream(String s, OutputStream outputstream) {
+diff --git a/main/java/net/minecraft/server/RegistrySimple.java b/main/java/net/minecraft/server/RegistrySimple.java
+index e76cb6e..8ee57c7 100644
+--- a/main/java/net/minecraft/server/RegistrySimple.java
++++ b/main/java/net/minecraft/server/RegistrySimple.java
+@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class RegistrySimple<K, V> implements IRegistry<K, V> {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(RegistrySimple.class);
+     protected final Map<K, V> c = this.b();
+ 
+     public RegistrySimple() {}
+diff --git a/main/java/net/minecraft/server/RemoteControlSession.java b/main/java/net/minecraft/server/RemoteControlSession.java
+index 1b45f81..4bb930f 100644
+--- a/main/java/net/minecraft/server/RemoteControlSession.java
++++ b/main/java/net/minecraft/server/RemoteControlSession.java
+@@ -10,8 +10,8 @@ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+ public class RemoteControlSession extends RemoteConnectionThread {
+-
+-    private static final Logger h = LogManager.getLogger();
++    
++    private static final Logger h = LogManager.getLogger(RemoteControlSession.class);
+     private boolean i;
+     private Socket j;
+     private byte[] k = new byte[1460];
+diff --git a/main/java/net/minecraft/server/ServerConnection.java b/main/java/net/minecraft/server/ServerConnection.java
+index 6d83f87..38a3a18 100644
+--- a/main/java/net/minecraft/server/ServerConnection.java
++++ b/main/java/net/minecraft/server/ServerConnection.java
+@@ -29,7 +29,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class ServerConnection {
+ 
+-    private static final Logger e = LogManager.getLogger();
++    private static final Logger e = LogManager.getLogger(ServerConnection.class);
+     public static final LazyInitVar<NioEventLoopGroup> a = new LazyInitVar() {
+         protected NioEventLoopGroup a() {
+             return new NioEventLoopGroup(0, (new ThreadFactoryBuilder()).setNameFormat("Netty Server IO #%d").setDaemon(true).build());
+diff --git a/main/java/net/minecraft/server/ServerStatisticManager.java b/main/java/net/minecraft/server/ServerStatisticManager.java
+index 46845cd..a9cdcca 100644
+--- a/main/java/net/minecraft/server/ServerStatisticManager.java
++++ b/main/java/net/minecraft/server/ServerStatisticManager.java
+@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class ServerStatisticManager extends StatisticManager {
+ 
+-    private static final Logger b = LogManager.getLogger();
++    private static final Logger b = LogManager.getLogger(ServerStatisticManager.class);
+     private final MinecraftServer c;
+     private final File d;
+     private final Set<Statistic> e = Sets.newHashSet();
+diff --git a/main/java/net/minecraft/server/ThreadWatchdog.java b/main/java/net/minecraft/server/ThreadWatchdog.java
+index 8a56c23..9f08790 100644
+--- a/main/java/net/minecraft/server/ThreadWatchdog.java
++++ b/main/java/net/minecraft/server/ThreadWatchdog.java
+@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class ThreadWatchdog implements Runnable {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(ThreadWatchdog.class);
+     private final DedicatedServer b;
+     private final long c;
+ 
+diff --git a/main/java/net/minecraft/server/TileEntity.java b/main/java/net/minecraft/server/TileEntity.java
+index 0311b01..ee2b435 100644
+--- a/main/java/net/minecraft/server/TileEntity.java
++++ b/main/java/net/minecraft/server/TileEntity.java
+@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public abstract class TileEntity {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(TileEntity.class);
+     private static Map<String, Class<? extends TileEntity>> f = Maps.newHashMap();
+     private static Map<Class<? extends TileEntity>, String> g = Maps.newHashMap();
+     protected World world;
+diff --git a/main/java/net/minecraft/server/WorldGenDungeons.java b/main/java/net/minecraft/server/WorldGenDungeons.java
+index d76e554..5a3d268 100644
+--- a/main/java/net/minecraft/server/WorldGenDungeons.java
++++ b/main/java/net/minecraft/server/WorldGenDungeons.java
+@@ -9,7 +9,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class WorldGenDungeons extends WorldGenerator {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(WorldGenDungeons.class);
+     private static final String[] b = new String[] { "Skeleton", "Zombie", "Zombie", "Spider"};
+     private static final List<StructurePieceTreasure> c = Lists.newArrayList(new StructurePieceTreasure[] { new StructurePieceTreasure(Items.SADDLE, 0, 1, 1, 10), new StructurePieceTreasure(Items.IRON_INGOT, 0, 1, 4, 10), new StructurePieceTreasure(Items.BREAD, 0, 1, 1, 10), new StructurePieceTreasure(Items.WHEAT, 0, 1, 4, 10), new StructurePieceTreasure(Items.GUNPOWDER, 0, 1, 4, 10), new StructurePieceTreasure(Items.STRING, 0, 1, 4, 10), new StructurePieceTreasure(Items.BUCKET, 0, 1, 1, 10), new StructurePieceTreasure(Items.GOLDEN_APPLE, 0, 1, 1, 1), new StructurePieceTreasure(Items.REDSTONE, 0, 1, 4, 10), new StructurePieceTreasure(Items.RECORD_13, 0, 1, 1, 4), new StructurePieceTreasure(Items.RECORD_CAT, 0, 1, 1, 4), new StructurePieceTreasure(Items.NAME_TAG, 0, 1, 1, 10), new StructurePieceTreasure(Items.GOLDEN_HORSE_ARMOR, 0, 1, 1, 2), new StructurePieceTreasure(Items.IRON_HORSE_ARMOR, 0, 1, 1, 5), new StructurePieceTreasure(Items.DIAMOND_HORSE_ARMOR, 0, 1, 1, 1)});
+ 
+diff --git a/main/java/net/minecraft/server/WorldGenFactory.java b/main/java/net/minecraft/server/WorldGenFactory.java
+index a324499..bb7185c 100644
+--- a/main/java/net/minecraft/server/WorldGenFactory.java
++++ b/main/java/net/minecraft/server/WorldGenFactory.java
+@@ -7,7 +7,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class WorldGenFactory {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(WorldGenFactory.class);
+     private static Map<String, Class<? extends StructureStart>> b = Maps.newHashMap();
+     private static Map<Class<? extends StructureStart>, String> c = Maps.newHashMap();
+     private static Map<String, Class<? extends StructurePiece>> d = Maps.newHashMap();
+diff --git a/main/java/net/minecraft/server/WorldLoader.java b/main/java/net/minecraft/server/WorldLoader.java
+index b82108f..fedb803 100644
+--- a/main/java/net/minecraft/server/WorldLoader.java
++++ b/main/java/net/minecraft/server/WorldLoader.java
+@@ -8,7 +8,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class WorldLoader implements Convertable {
+ 
+-    private static final Logger b = LogManager.getLogger();
++    private static final Logger b = LogManager.getLogger(WorldLoader.class);
+     protected final File a;
+ 
+     public WorldLoader(File file) {
+diff --git a/main/java/net/minecraft/server/WorldLoaderServer.java b/main/java/net/minecraft/server/WorldLoaderServer.java
+index 6577590..5047ce4 100644
+--- a/main/java/net/minecraft/server/WorldLoaderServer.java
++++ b/main/java/net/minecraft/server/WorldLoaderServer.java
+@@ -16,7 +16,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class WorldLoaderServer extends WorldLoader {
+ 
+-    private static final Logger b = LogManager.getLogger();
++    private static final Logger b = LogManager.getLogger(WorldLoaderServer.class);
+ 
+     public WorldLoaderServer(File file) {
+         super(file);
+diff --git a/main/java/net/minecraft/server/WorldNBTStorage.java b/main/java/net/minecraft/server/WorldNBTStorage.java
+index 960da39..96ef959 100644
+--- a/main/java/net/minecraft/server/WorldNBTStorage.java
++++ b/main/java/net/minecraft/server/WorldNBTStorage.java
+@@ -13,7 +13,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class WorldNBTStorage implements IDataManager, IPlayerFileData {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(WorldNBTStorage.class);
+     private final File baseDir;
+     private final File playerDir;
+     private final File dataDir;
+diff --git a/main/java/net/minecraft/server/WorldServer.java b/main/java/net/minecraft/server/WorldServer.java
+index 8f1259a..d14c878 100644
+--- a/main/java/net/minecraft/server/WorldServer.java
++++ b/main/java/net/minecraft/server/WorldServer.java
+@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Logger;
+ 
+ public class WorldServer extends World implements IAsyncTaskHandler {
+ 
+-    private static final Logger a = LogManager.getLogger();
++    private static final Logger a = LogManager.getLogger(WorldServer.class);
+     private final MinecraftServer server;
+     public EntityTracker tracker;
+     private final PlayerChunkMap manager;
+-- 
+2.45.1
+
