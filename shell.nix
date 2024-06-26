@@ -26,7 +26,7 @@
     fernflower = "${builddata}/bin/fernflower.jar";
     mapPath = key: "${builddata}/mappings/${builtins.getAttr key info}";
   in stdenv.mkDerivation {
-    name = "decompiled-jar";
+    name = "margit-decompiled-jar";
     src = original;
     phases = [ "buildPhase" "installPhase" ];
     buildInputs = [ jdk8 unzip gnutar ];
