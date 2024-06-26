@@ -1,4 +1,4 @@
-From db4f6c4a89faeaea94fe03366d74b017fbf78876 Mon Sep 17 00:00:00 2001
+From 0d79e52163582f73e6eb5db104ee75367b9a0489 Mon Sep 17 00:00:00 2001
 From: Joseph DALY <joseph300905@gmail.com>
 Date: Wed, 26 Jun 2024 12:28:46 +0200
 Subject: [PATCH] use jdk22
@@ -32,7 +32,7 @@ Subject: [PATCH] use jdk22
  .../net/minecraft/server/LoginListener.java   |  2 +-
  .../net/minecraft/server/MethodProfiler.java  |  2 +-
  .../minecraft/server/MinecraftEncryption.java |  2 +-
- .../net/minecraft/server/MinecraftServer.java |  5 +++-
+ .../net/minecraft/server/MinecraftServer.java |  2 +-
  main/java/net/minecraft/server/MobEffect.java |  2 +-
  .../net/minecraft/server/MojangsonParser.java |  2 +-
  .../java/net/minecraft/server/NBTTagList.java |  2 +-
@@ -61,7 +61,7 @@ Subject: [PATCH] use jdk22
  .../minecraft/server/WorldLoaderServer.java   |  2 +-
  .../net/minecraft/server/WorldNBTStorage.java |  2 +-
  .../net/minecraft/server/WorldServer.java     |  2 +-
- 57 files changed, 72 insertions(+), 74 deletions(-)
+ 57 files changed, 69 insertions(+), 74 deletions(-)
 
 diff --git a/main/java/net/minecraft/server/BiomeBase.java b/main/java/net/minecraft/server/BiomeBase.java
 index c01a400..2285ada 100644
@@ -463,7 +463,7 @@ index 74c50e7..117dc6e 100644
      public static KeyPair b() {
          try {
 diff --git a/main/java/net/minecraft/server/MinecraftServer.java b/main/java/net/minecraft/server/MinecraftServer.java
-index 82c93ad..558d5b2 100644
+index 82c93ad..489ee8a 100644
 --- a/main/java/net/minecraft/server/MinecraftServer.java
 +++ b/main/java/net/minecraft/server/MinecraftServer.java
 @@ -40,7 +40,7 @@ import org.apache.logging.log4j.Logger;
@@ -475,16 +475,6 @@ index 82c93ad..558d5b2 100644
      public static final File a = new File("usercache.json");
      private static MinecraftServer l;
      public Convertable convertable;
-@@ -575,6 +575,9 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
-     }
- 
-     public static void main(String[] astring) {
-+        System.out.println("Hello, World?");
-+        LOGGER.info("Hello, World!");
-+        
-         DispenserRegistry.c();
- 
-         try {
 diff --git a/main/java/net/minecraft/server/MobEffect.java b/main/java/net/minecraft/server/MobEffect.java
 index c9f433f..81f20c8 100644
 --- a/main/java/net/minecraft/server/MobEffect.java
