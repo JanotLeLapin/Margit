@@ -29,7 +29,8 @@
   };
 
   margit-mapped-jar = callPackage ./remap.nix { inherit margit-original-jar margit-build-data; };
-  margit-decompiled-jar = callPackage ./decompile.nix { inherit margit-mapped-jar margit-build-data; };
+  margit-decompiled-src = callPackage ./decompile.nix { inherit margit-mapped-jar margit-build-data; };
+  margit-patched-src = callPackage ./apply-patches.nix { inherit margit-decompiled-src; };
 in mkShell {
   buildInputs = [
     jdk22 git gnutar jdt-language-server
@@ -38,13 +39,6 @@ in mkShell {
   shellHook = ''
     rm -rf src
     mkdir -p src
-    git -C src init
-
-    tar -xzvf ${margit-decompiled-jar}
-    git -C src add .
-    git -C src commit -m "initial commit"
-    for patch in ./patches/*.patch; do
-      git -C src am < $patch
-    done
+    tar -xzf ${margit-patched-src}/patched.tar.gz -C src
   '';
 }
