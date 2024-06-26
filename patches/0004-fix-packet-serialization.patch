@@ -1,0 +1,27 @@
+From cf19a7b9b2129bbc0024f588e02ffd91c525f412 Mon Sep 17 00:00:00 2001
+From: Joseph DALY <joseph300905@gmail.com>
+Date: Wed, 26 Jun 2024 10:20:14 +0200
+Subject: [PATCH] fix packet serialization
+
+---
+ main/java/net/minecraft/server/PacketDataSerializer.java | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/main/java/net/minecraft/server/PacketDataSerializer.java b/main/java/net/minecraft/server/PacketDataSerializer.java
+index 4463d6e..5c865bc 100644
+--- a/main/java/net/minecraft/server/PacketDataSerializer.java
++++ b/main/java/net/minecraft/server/PacketDataSerializer.java
+@@ -204,7 +204,9 @@ public class PacketDataSerializer extends ByteBuf {
+         } else if (j < 0) {
+             throw new DecoderException("The received encoded string buffer length is less than zero! Weird string!");
+         } else {
+-            String s = new String(this.readBytes(j).array(), Charsets.UTF_8);
++            byte[] bytes = new byte[j];
++            this.readBytes(bytes);
++            String s = new String(bytes, Charsets.UTF_8);
+ 
+             if (s.length() > i) {
+                 throw new DecoderException("The received string length is longer than maximum allowed (" + j + " > " + i + ")");
+-- 
+2.45.1
+
