@@ -18,6 +18,7 @@ dependencies {
     implementation("com.mojang:authlib:3.4.40")
     implementation("org.apache.logging.log4j:log4j-api:2.23.1")
     implementation("org.apache.logging.log4j:log4j-core:2.23.1")
+    implementation("org.apache.logging.log4j:log4j-slf4j18-impl:2.18.0") // com.mojang.authlib
 }
 
 java {
