@@ -1,0 +1,623 @@
+From 77c26bfdd91b73307cf4a61a42be3aa5b17008f0 Mon Sep 17 00:00:00 2001
+From: Joseph DALY <joseph300905@gmail.com>
+Date: Wed, 26 Jun 2024 19:16:02 +0200
+Subject: [PATCH] avoid using deprecated operations
+
+---
+ main/java/net/minecraft/server/EntityBat.java      |  2 +-
+ main/java/net/minecraft/server/EntityBlaze.java    |  2 +-
+ main/java/net/minecraft/server/EntityBoat.java     |  6 +++---
+ main/java/net/minecraft/server/EntityEnderman.java |  6 +++---
+ main/java/net/minecraft/server/EntityHanging.java  |  3 ++-
+ .../minecraft/server/EntityMinecartAbstract.java   | 10 +++++-----
+ .../minecraft/server/EntityMinecartFurnace.java    |  2 +-
+ main/java/net/minecraft/server/EntitySheep.java    |  2 +-
+ main/java/net/minecraft/server/EntitySkeleton.java |  2 +-
+ main/java/net/minecraft/server/EntitySpider.java   |  2 +-
+ main/java/net/minecraft/server/EntityWither.java   |  8 ++++----
+ main/java/net/minecraft/server/EntityWolf.java     |  6 +++---
+ main/java/net/minecraft/server/EnumProtocol.java   | 10 ++++++----
+ main/java/net/minecraft/server/LocaleLanguage.java |  3 ++-
+ main/java/net/minecraft/server/MinecraftKey.java   |  5 +++--
+ .../java/net/minecraft/server/MinecraftServer.java |  5 +++--
+ .../server/MojangStatisticsGenerator.java          |  6 ++++--
+ main/java/net/minecraft/server/NetworkManager.java | 14 +++++++-------
+ .../net/minecraft/server/PacketDataSerializer.java |  2 ++
+ main/java/net/minecraft/server/PacketDecoder.java  |  2 +-
+ main/java/net/minecraft/server/PacketEncoder.java  |  2 +-
+ main/java/net/minecraft/server/RegistryBlocks.java |  4 ++--
+ main/java/net/minecraft/server/RegistrySimple.java |  6 +++---
+ .../net/minecraft/server/ServerConnection.java     |  8 ++++----
+ .../minecraft/server/ServerStatisticManager.java   |  7 ++++---
+ main/java/net/minecraft/server/ThreadWatchdog.java |  2 +-
+ main/java/net/minecraft/server/TileEntity.java     |  2 +-
+ .../java/net/minecraft/server/WorldGenFactory.java |  4 ++--
+ 28 files changed, 72 insertions(+), 61 deletions(-)
+
+diff --git a/main/java/net/minecraft/server/EntityBat.java b/main/java/net/minecraft/server/EntityBat.java
+index 5241620..62a9a52 100644
+--- a/main/java/net/minecraft/server/EntityBat.java
++++ b/main/java/net/minecraft/server/EntityBat.java
+@@ -14,7 +14,7 @@ public class EntityBat extends EntityAmbient {
+ 
+     protected void h() {
+         super.h();
+-        this.datawatcher.a(16, new Byte((byte) 0));
++        this.datawatcher.a(16, Byte.valueOf((byte) 0));
+     }
+ 
+     protected float bB() {
+diff --git a/main/java/net/minecraft/server/EntityBlaze.java b/main/java/net/minecraft/server/EntityBlaze.java
+index c6b7113..7d49bc4 100644
+--- a/main/java/net/minecraft/server/EntityBlaze.java
++++ b/main/java/net/minecraft/server/EntityBlaze.java
+@@ -27,7 +27,7 @@ public class EntityBlaze extends EntityMonster {
+ 
+     protected void h() {
+         super.h();
+-        this.datawatcher.a(16, new Byte((byte) 0));
++        this.datawatcher.a(16, Byte.valueOf((byte) 0));
+     }
+ 
+     protected String z() {
+diff --git a/main/java/net/minecraft/server/EntityBoat.java b/main/java/net/minecraft/server/EntityBoat.java
+index 40574f8..485f954 100644
+--- a/main/java/net/minecraft/server/EntityBoat.java
++++ b/main/java/net/minecraft/server/EntityBoat.java
+@@ -26,9 +26,9 @@ public class EntityBoat extends Entity {
+     }
+ 
+     protected void h() {
+-        this.datawatcher.a(17, new Integer(0));
+-        this.datawatcher.a(18, new Integer(1));
+-        this.datawatcher.a(19, new Float(0.0F));
++        this.datawatcher.a(17, Integer.valueOf(0));
++        this.datawatcher.a(18, Integer.valueOf(1));
++        this.datawatcher.a(19, Float.valueOf(0.0F));
+     }
+ 
+     public AxisAlignedBB j(Entity entity) {
+diff --git a/main/java/net/minecraft/server/EntityEnderman.java b/main/java/net/minecraft/server/EntityEnderman.java
+index d3147ea..bd590bf 100644
+--- a/main/java/net/minecraft/server/EntityEnderman.java
++++ b/main/java/net/minecraft/server/EntityEnderman.java
+@@ -49,9 +49,9 @@ public class EntityEnderman extends EntityMonster {
+ 
+     protected void h() {
+         super.h();
+-        this.datawatcher.a(16, new Short((short) 0));
+-        this.datawatcher.a(17, new Byte((byte) 0));
+-        this.datawatcher.a(18, new Byte((byte) 0));
++        this.datawatcher.a(16, Short.valueOf((short) 0));
++        this.datawatcher.a(17, Byte.valueOf((byte) 0));
++        this.datawatcher.a(18, Byte.valueOf((byte) 0));
+     }
+ 
+     public void b(NBTTagCompound nbttagcompound) {
+diff --git a/main/java/net/minecraft/server/EntityHanging.java b/main/java/net/minecraft/server/EntityHanging.java
+index 816a118..6b21db8 100644
+--- a/main/java/net/minecraft/server/EntityHanging.java
++++ b/main/java/net/minecraft/server/EntityHanging.java
+@@ -2,6 +2,7 @@ package net.minecraft.server;
+ 
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import org.apache.commons.lang3.Validate;
+ 
+ public abstract class EntityHanging extends Entity {
+@@ -23,7 +24,7 @@ public abstract class EntityHanging extends Entity {
+     protected void h() {}
+ 
+     public void setDirection(EnumDirection enumdirection) {
+-        Validate.notNull(enumdirection);
++        Objects.requireNonNull(enumdirection);
+         Validate.isTrue(enumdirection.k().c());
+         this.direction = enumdirection;
+         this.lastYaw = this.yaw = (float) (this.direction.b() * 90);
+diff --git a/main/java/net/minecraft/server/EntityMinecartAbstract.java b/main/java/net/minecraft/server/EntityMinecartAbstract.java
+index 14420ed..0a19343 100644
+--- a/main/java/net/minecraft/server/EntityMinecartAbstract.java
++++ b/main/java/net/minecraft/server/EntityMinecartAbstract.java
+@@ -52,11 +52,11 @@ public abstract class EntityMinecartAbstract extends Entity implements INamableT
+     }
+ 
+     protected void h() {
+-        this.datawatcher.a(17, new Integer(0));
+-        this.datawatcher.a(18, new Integer(1));
+-        this.datawatcher.a(19, new Float(0.0F));
+-        this.datawatcher.a(20, new Integer(0));
+-        this.datawatcher.a(21, new Integer(6));
++        this.datawatcher.a(17, Integer.valueOf(0));
++        this.datawatcher.a(18, Integer.valueOf(1));
++        this.datawatcher.a(19, Float.valueOf(0.0F));
++        this.datawatcher.a(20, Integer.valueOf(0));
++        this.datawatcher.a(21, Integer.valueOf(6));
+         this.datawatcher.a(22, Byte.valueOf((byte) 0));
+     }
+ 
+diff --git a/main/java/net/minecraft/server/EntityMinecartFurnace.java b/main/java/net/minecraft/server/EntityMinecartFurnace.java
+index 6740503..cff4cca 100644
+--- a/main/java/net/minecraft/server/EntityMinecartFurnace.java
++++ b/main/java/net/minecraft/server/EntityMinecartFurnace.java
+@@ -20,7 +20,7 @@ public class EntityMinecartFurnace extends EntityMinecartAbstract {
+ 
+     protected void h() {
+         super.h();
+-        this.datawatcher.a(16, new Byte((byte) 0));
++        this.datawatcher.a(16, Byte.valueOf((byte) 0));
+     }
+ 
+     public void t_() {
+diff --git a/main/java/net/minecraft/server/EntitySheep.java b/main/java/net/minecraft/server/EntitySheep.java
+index 21e6f43..1c41b51 100644
+--- a/main/java/net/minecraft/server/EntitySheep.java
++++ b/main/java/net/minecraft/server/EntitySheep.java
+@@ -57,7 +57,7 @@ public class EntitySheep extends EntityAnimal {
+ 
+     protected void h() {
+         super.h();
+-        this.datawatcher.a(16, new Byte((byte) 0));
++        this.datawatcher.a(16, Byte.valueOf((byte) 0));
+     }
+ 
+     protected void dropDeathLoot(boolean flag, int i) {
+diff --git a/main/java/net/minecraft/server/EntitySkeleton.java b/main/java/net/minecraft/server/EntitySkeleton.java
+index 6c6df13..c7cf590 100644
+--- a/main/java/net/minecraft/server/EntitySkeleton.java
++++ b/main/java/net/minecraft/server/EntitySkeleton.java
+@@ -32,7 +32,7 @@ public class EntitySkeleton extends EntityMonster implements IRangedEntity {
+ 
+     protected void h() {
+         super.h();
+-        this.datawatcher.a(13, new Byte((byte) 0));
++        this.datawatcher.a(13, Byte.valueOf((byte) 0));
+     }
+ 
+     protected String z() {
+diff --git a/main/java/net/minecraft/server/EntitySpider.java b/main/java/net/minecraft/server/EntitySpider.java
+index 101d038..00ef06c 100644
+--- a/main/java/net/minecraft/server/EntitySpider.java
++++ b/main/java/net/minecraft/server/EntitySpider.java
+@@ -29,7 +29,7 @@ public class EntitySpider extends EntityMonster {
+ 
+     protected void h() {
+         super.h();
+-        this.datawatcher.a(16, new Byte((byte) 0));
++        this.datawatcher.a(16, Byte.valueOf((byte) 0));
+     }
+ 
+     public void t_() {
+diff --git a/main/java/net/minecraft/server/EntityWither.java b/main/java/net/minecraft/server/EntityWither.java
+index c216e62..550a8c3 100644
+--- a/main/java/net/minecraft/server/EntityWither.java
++++ b/main/java/net/minecraft/server/EntityWither.java
+@@ -42,10 +42,10 @@ public class EntityWither extends EntityMonster implements IRangedEntity {
+ 
+     protected void h() {
+         super.h();
+-        this.datawatcher.a(17, new Integer(0));
+-        this.datawatcher.a(18, new Integer(0));
+-        this.datawatcher.a(19, new Integer(0));
+-        this.datawatcher.a(20, new Integer(0));
++        this.datawatcher.a(17, Integer.valueOf(0));
++        this.datawatcher.a(18, Integer.valueOf(0));
++        this.datawatcher.a(19, Integer.valueOf(0));
++        this.datawatcher.a(20, Integer.valueOf(0));
+     }
+ 
+     public void b(NBTTagCompound nbttagcompound) {
+diff --git a/main/java/net/minecraft/server/EntityWolf.java b/main/java/net/minecraft/server/EntityWolf.java
+index db24dc6..3b839b9 100644
+--- a/main/java/net/minecraft/server/EntityWolf.java
++++ b/main/java/net/minecraft/server/EntityWolf.java
+@@ -70,9 +70,9 @@ public class EntityWolf extends EntityTameableAnimal {
+ 
+     protected void h() {
+         super.h();
+-        this.datawatcher.a(18, new Float(this.getHealth()));
+-        this.datawatcher.a(19, new Byte((byte) 0));
+-        this.datawatcher.a(20, new Byte((byte) EnumColor.RED.getColorIndex()));
++        this.datawatcher.a(18, Float.valueOf(this.getHealth()));
++        this.datawatcher.a(19, Byte.valueOf((byte) 0));
++        this.datawatcher.a(20, Byte.valueOf((byte) EnumColor.RED.getColorIndex()));
+     }
+ 
+     protected void a(BlockPosition blockposition, Block block) {
+diff --git a/main/java/net/minecraft/server/EnumProtocol.java b/main/java/net/minecraft/server/EnumProtocol.java
+index 1ec39da..915a3e7 100644
+--- a/main/java/net/minecraft/server/EnumProtocol.java
++++ b/main/java/net/minecraft/server/EnumProtocol.java
+@@ -3,6 +3,8 @@ package net.minecraft.server;
+ import com.google.common.collect.BiMap;
+ import com.google.common.collect.HashBiMap;
+ import com.google.common.collect.Maps;
++
++import java.lang.reflect.InvocationTargetException;
+ import java.util.Iterator;
+ import java.util.Map;
+ import org.apache.logging.log4j.LogManager;
+@@ -169,10 +171,10 @@ public enum EnumProtocol {
+         return (Integer) ((BiMap) this.j.get(enumprotocoldirection)).inverse().get(packet.getClass());
+     }
+ 
+-    public Packet a(EnumProtocolDirection enumprotocoldirection, int i) throws IllegalAccessException, InstantiationException {
++    public Packet a(EnumProtocolDirection enumprotocoldirection, int i) throws NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+         Class oclass = (Class) ((BiMap) this.j.get(enumprotocoldirection)).get(Integer.valueOf(i));
+ 
+-        return oclass == null ? null : (Packet) oclass.newInstance();
++        return oclass == null ? null : (Packet) oclass.getConstructor().newInstance();
+     }
+ 
+     public int a() {
+@@ -218,8 +220,8 @@ public enum EnumProtocol {
+                     }
+ 
+                     try {
+-                        oclass.newInstance();
+-                    } catch (Throwable throwable) {
++                        oclass.getConstructor().newInstance();
++                    } catch (Exception e) {
+                         throw new Error("Packet " + oclass + " fails instantiation checks! " + oclass);
+                     }
+                 }
+diff --git a/main/java/net/minecraft/server/LocaleLanguage.java b/main/java/net/minecraft/server/LocaleLanguage.java
+index 7b46e65..a0907c5 100644
+--- a/main/java/net/minecraft/server/LocaleLanguage.java
++++ b/main/java/net/minecraft/server/LocaleLanguage.java
+@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
+ import com.google.common.collect.Maps;
+ import java.io.IOException;
+ import java.io.InputStream;
++import java.nio.charset.StandardCharsets;
+ import java.util.IllegalFormatException;
+ import java.util.Iterator;
+ import java.util.Map;
+@@ -22,7 +23,7 @@ public class LocaleLanguage {
+ 
+     public LocaleLanguage() {
+         InputStream inputstream = LocaleLanguage.class.getResourceAsStream("/assets/minecraft/lang/en_US.lang");
+-        Iterator iterator = IOUtils.readLines(inputstream, Charsets.UTF_8).iterator();
++        Iterator iterator = IOUtils.readLines(inputstream, StandardCharsets.UTF_8).iterator();
+ 
+         while (iterator.hasNext()) {
+             String s = (String) iterator.next();
+diff --git a/main/java/net/minecraft/server/MinecraftKey.java b/main/java/net/minecraft/server/MinecraftKey.java
+index dadc01e..a6bc961 100644
+--- a/main/java/net/minecraft/server/MinecraftKey.java
++++ b/main/java/net/minecraft/server/MinecraftKey.java
+@@ -1,7 +1,8 @@
+ package net.minecraft.server;
+ 
++import java.util.Objects;
++
+ import org.apache.commons.lang3.StringUtils;
+-import org.apache.commons.lang3.Validate;
+ 
+ public class MinecraftKey {
+ 
+@@ -11,7 +12,7 @@ public class MinecraftKey {
+     protected MinecraftKey(int i, String... astring) {
+         this.a = StringUtils.isEmpty(astring[0]) ? "minecraft" : astring[0].toLowerCase();
+         this.b = astring[1];
+-        Validate.notNull(this.b);
++        Objects.requireNonNull(this.b);
+     }
+ 
+     public MinecraftKey(String s) {
+diff --git a/main/java/net/minecraft/server/MinecraftServer.java b/main/java/net/minecraft/server/MinecraftServer.java
+index a57fe7d..2bc2879 100644
+--- a/main/java/net/minecraft/server/MinecraftServer.java
++++ b/main/java/net/minecraft/server/MinecraftServer.java
+@@ -27,6 +27,7 @@ import java.util.Collections;
+ import java.util.Date;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.Objects;
+ import java.util.Queue;
+ import java.util.Random;
+ import java.util.UUID;
+@@ -1180,7 +1181,7 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+     }
+ 
+     public <V> ListenableFuture<V> a(Callable<V> callable) {
+-        Validate.notNull(callable);
++        Objects.requireNonNull(callable);
+         if (!this.isMainThread() && !this.isStopped()) {
+             ListenableFutureTask listenablefuturetask = ListenableFutureTask.create(callable);
+             Queue queue = this.j;
+@@ -1199,7 +1200,7 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+     }
+ 
+     public ListenableFuture<Object> postToMainThread(Runnable runnable) {
+-        Validate.notNull(runnable);
++        Objects.requireNonNull(runnable);
+         return this.a(Executors.callable(runnable));
+     }
+ 
+diff --git a/main/java/net/minecraft/server/MojangStatisticsGenerator.java b/main/java/net/minecraft/server/MojangStatisticsGenerator.java
+index 076306d..2c79ba0 100644
+--- a/main/java/net/minecraft/server/MojangStatisticsGenerator.java
++++ b/main/java/net/minecraft/server/MojangStatisticsGenerator.java
+@@ -4,6 +4,8 @@ import com.google.common.collect.Maps;
+ import java.lang.management.ManagementFactory;
+ import java.lang.management.RuntimeMXBean;
+ import java.net.MalformedURLException;
++import java.net.URI;
++import java.net.URISyntaxException;
+ import java.net.URL;
+ import java.util.HashMap;
+ import java.util.Iterator;
+@@ -28,8 +30,8 @@ public class MojangStatisticsGenerator {
+ 
+     public MojangStatisticsGenerator(String s, IMojangStatistics imojangstatistics, long i) {
+         try {
+-            this.d = new URL("http://snoop.minecraft.net/" + s + "?version=" + 2);
+-        } catch (MalformedURLException malformedurlexception) {
++            this.d = new URI("http://snoop.minecraft.net/" + s + "?version=" + 2).toURL();
++        } catch (URISyntaxException | MalformedURLException malformedurlexception) {
+             throw new IllegalArgumentException();
+         }
+ 
+diff --git a/main/java/net/minecraft/server/NetworkManager.java b/main/java/net/minecraft/server/NetworkManager.java
+index f032f60..4b25e49 100644
+--- a/main/java/net/minecraft/server/NetworkManager.java
++++ b/main/java/net/minecraft/server/NetworkManager.java
+@@ -5,10 +5,10 @@ import io.netty.channel.Channel;
+ import io.netty.channel.ChannelFuture;
+ import io.netty.channel.ChannelFutureListener;
+ import io.netty.channel.ChannelHandlerContext;
++import io.netty.channel.DefaultEventLoopGroup;
+ import io.netty.channel.SimpleChannelInboundHandler;
+ import io.netty.channel.epoll.EpollEventLoopGroup;
+ import io.netty.channel.local.LocalChannel;
+-import io.netty.channel.local.LocalEventLoopGroup;
+ import io.netty.channel.local.LocalServerChannel;
+ import io.netty.channel.nio.NioEventLoopGroup;
+ import io.netty.handler.timeout.TimeoutException;
+@@ -30,7 +30,7 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
+ 
+     private static final Logger g = LogManager.getLogger(NetworkManager.class);
+     public static final Marker a = MarkerManager.getMarker("NETWORK");
+-    public static final Marker b = MarkerManager.getMarker("NETWORK_PACKETS", NetworkManager.a);
++    public static final Marker b = MarkerManager.getMarker("NETWORK_PACKETS").addParents(NetworkManager.a);
+     public static final AttributeKey<EnumProtocol> c = AttributeKey.valueOf("protocol");
+     public static final LazyInitVar<NioEventLoopGroup> d = new LazyInitVar() {
+         protected NioEventLoopGroup a() {
+@@ -50,9 +50,9 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
+             return this.a();
+         }
+     };
+-    public static final LazyInitVar<LocalEventLoopGroup> f = new LazyInitVar() {
+-        protected LocalEventLoopGroup a() {
+-            return new LocalEventLoopGroup(0, Thread.ofVirtual().name("netty-local-client-io", 0).factory());
++    public static final LazyInitVar<DefaultEventLoopGroup> f = new LazyInitVar() {
++        protected DefaultEventLoopGroup a() {
++            return new DefaultEventLoopGroup(0, Thread.ofVirtual().name("netty-local-client-io", 0).factory());
+         }
+ 
+         protected Object init() {
+@@ -144,12 +144,12 @@ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
+     public void a(Packet packet, GenericFutureListener<? extends Future<? super Void>> genericfuturelistener, GenericFutureListener<? extends Future<? super Void>>... agenericfuturelistener) {
+         if (this.g()) {
+             this.m();
+-            this.a(packet, (GenericFutureListener[]) ArrayUtils.add(agenericfuturelistener, 0, genericfuturelistener));
++            this.a(packet, (GenericFutureListener[]) ArrayUtils.insert(0, agenericfuturelistener, genericfuturelistener));
+         } else {
+             this.j.writeLock().lock();
+ 
+             try {
+-                this.i.add(new NetworkManager.QueuedPacket(packet, (GenericFutureListener[]) ArrayUtils.add(agenericfuturelistener, 0, genericfuturelistener)));
++                this.i.add(new NetworkManager.QueuedPacket(packet, (GenericFutureListener[]) ArrayUtils.insert(0, agenericfuturelistener, genericfuturelistener)));
+             } finally {
+                 this.j.writeLock().unlock();
+             }
+diff --git a/main/java/net/minecraft/server/PacketDataSerializer.java b/main/java/net/minecraft/server/PacketDataSerializer.java
+index 5c865bc..f11900e 100644
+--- a/main/java/net/minecraft/server/PacketDataSerializer.java
++++ b/main/java/net/minecraft/server/PacketDataSerializer.java
+@@ -244,10 +244,12 @@ public class PacketDataSerializer extends ByteBuf {
+         return this.a.alloc();
+     }
+ 
++    @Deprecated
+     public ByteOrder order() {
+         return this.a.order();
+     }
+ 
++    @Deprecated
+     public ByteBuf order(ByteOrder byteorder) {
+         return this.a.order(byteorder);
+     }
+diff --git a/main/java/net/minecraft/server/PacketDecoder.java b/main/java/net/minecraft/server/PacketDecoder.java
+index 2513261..1876579 100644
+--- a/main/java/net/minecraft/server/PacketDecoder.java
++++ b/main/java/net/minecraft/server/PacketDecoder.java
+@@ -13,7 +13,7 @@ import org.apache.logging.log4j.MarkerManager;
+ public class PacketDecoder extends ByteToMessageDecoder {
+ 
+     private static final Logger a = LogManager.getLogger(PacketDecoder.class);
+-    private static final Marker b = MarkerManager.getMarker("PACKET_RECEIVED", NetworkManager.b);
++    private static final Marker b = MarkerManager.getMarker("PACKET_RECEIVED").addParents(NetworkManager.b);
+     private final EnumProtocolDirection c;
+ 
+     public PacketDecoder(EnumProtocolDirection enumprotocoldirection) {
+diff --git a/main/java/net/minecraft/server/PacketEncoder.java b/main/java/net/minecraft/server/PacketEncoder.java
+index 083d3e3..ba6cf50 100644
+--- a/main/java/net/minecraft/server/PacketEncoder.java
++++ b/main/java/net/minecraft/server/PacketEncoder.java
+@@ -12,7 +12,7 @@ import org.apache.logging.log4j.MarkerManager;
+ public class PacketEncoder extends MessageToByteEncoder<Packet> {
+ 
+     private static final Logger a = LogManager.getLogger(PacketEncoder.class);
+-    private static final Marker b = MarkerManager.getMarker("PACKET_SENT", NetworkManager.b);
++    private static final Marker b = MarkerManager.getMarker("PACKET_SENT").addParents(NetworkManager.b);
+     private final EnumProtocolDirection c;
+ 
+     public PacketEncoder(EnumProtocolDirection enumprotocoldirection) {
+diff --git a/main/java/net/minecraft/server/RegistryBlocks.java b/main/java/net/minecraft/server/RegistryBlocks.java
+index 3968aaf..36129b6 100644
+--- a/main/java/net/minecraft/server/RegistryBlocks.java
++++ b/main/java/net/minecraft/server/RegistryBlocks.java
+@@ -1,6 +1,6 @@
+ package net.minecraft.server;
+ 
+-import org.apache.commons.lang3.Validate;
++import java.util.Objects;
+ 
+ public class RegistryBlocks<K, V> extends RegistryMaterials<K, V> {
+ 
+@@ -20,7 +20,7 @@ public class RegistryBlocks<K, V> extends RegistryMaterials<K, V> {
+     }
+ 
+     public void a() {
+-        Validate.notNull(this.d);
++        Objects.requireNonNull(this.d);
+     }
+ 
+     public V get(K k0) {
+diff --git a/main/java/net/minecraft/server/RegistrySimple.java b/main/java/net/minecraft/server/RegistrySimple.java
+index 8ee57c7..7fe3b4a 100644
+--- a/main/java/net/minecraft/server/RegistrySimple.java
++++ b/main/java/net/minecraft/server/RegistrySimple.java
+@@ -4,8 +4,8 @@ import com.google.common.collect.Maps;
+ import java.util.Collections;
+ import java.util.Iterator;
+ import java.util.Map;
++import java.util.Objects;
+ import java.util.Set;
+-import org.apache.commons.lang3.Validate;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
+@@ -25,8 +25,8 @@ public class RegistrySimple<K, V> implements IRegistry<K, V> {
+     }
+ 
+     public void a(K k0, V v0) {
+-        Validate.notNull(k0);
+-        Validate.notNull(v0);
++        Objects.requireNonNull(k0);
++        Objects.requireNonNull(v0);
+         if (this.c.containsKey(k0)) {
+             RegistrySimple.a.debug("Adding duplicate key \'" + k0 + "\' to registry");
+         }
+diff --git a/main/java/net/minecraft/server/ServerConnection.java b/main/java/net/minecraft/server/ServerConnection.java
+index 0512e9a..6b000dc 100644
+--- a/main/java/net/minecraft/server/ServerConnection.java
++++ b/main/java/net/minecraft/server/ServerConnection.java
+@@ -7,11 +7,11 @@ import io.netty.channel.ChannelException;
+ import io.netty.channel.ChannelFuture;
+ import io.netty.channel.ChannelInitializer;
+ import io.netty.channel.ChannelOption;
++import io.netty.channel.DefaultEventLoopGroup;
+ import io.netty.channel.EventLoopGroup;
+ import io.netty.channel.epoll.Epoll;
+ import io.netty.channel.epoll.EpollEventLoopGroup;
+ import io.netty.channel.epoll.EpollServerSocketChannel;
+-import io.netty.channel.local.LocalEventLoopGroup;
+ import io.netty.channel.nio.NioEventLoopGroup;
+ import io.netty.channel.socket.nio.NioServerSocketChannel;
+ import io.netty.handler.timeout.ReadTimeoutHandler;
+@@ -47,9 +47,9 @@ public class ServerConnection {
+             return this.a();
+         }
+     };
+-    public static final LazyInitVar<LocalEventLoopGroup> c = new LazyInitVar() {
+-        protected LocalEventLoopGroup a() {
+-            return new LocalEventLoopGroup(0, Thread.ofVirtual().name("netty-local-server-io", 0).factory());
++    public static final LazyInitVar<DefaultEventLoopGroup> c = new LazyInitVar() {
++        protected DefaultEventLoopGroup a() {
++            return new DefaultEventLoopGroup(0, Thread.ofVirtual().name("netty-local-server-io", 0).factory());
+         }
+ 
+         protected Object init() {
+diff --git a/main/java/net/minecraft/server/ServerStatisticManager.java b/main/java/net/minecraft/server/ServerStatisticManager.java
+index a9cdcca..3a917bc 100644
+--- a/main/java/net/minecraft/server/ServerStatisticManager.java
++++ b/main/java/net/minecraft/server/ServerStatisticManager.java
+@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
+ import java.io.File;
+ import java.io.IOException;
+ import java.lang.reflect.Constructor;
++import java.nio.charset.StandardCharsets;
+ import java.util.HashMap;
+ import java.util.HashSet;
+ import java.util.Iterator;
+@@ -37,7 +38,7 @@ public class ServerStatisticManager extends StatisticManager {
+         if (this.d.isFile()) {
+             try {
+                 this.a.clear();
+-                this.a.putAll(this.a(FileUtils.readFileToString(this.d)));
++                this.a.putAll(this.a(FileUtils.readFileToString(this.d, StandardCharsets.UTF_8)));
+             } catch (IOException ioexception) {
+                 ServerStatisticManager.b.error("Couldn\'t read statistics file " + this.d, ioexception);
+             } catch (JsonParseException jsonparseexception) {
+@@ -49,7 +50,7 @@ public class ServerStatisticManager extends StatisticManager {
+ 
+     public void b() {
+         try {
+-            FileUtils.writeStringToFile(this.d, a(this.a));
++            FileUtils.writeStringToFile(this.d, a(this.a), StandardCharsets.UTF_8);
+         } catch (IOException ioexception) {
+             ServerStatisticManager.b.error("Couldn\'t save stats", ioexception);
+         }
+@@ -86,7 +87,7 @@ public class ServerStatisticManager extends StatisticManager {
+     }
+ 
+     public Map<Statistic, StatisticWrapper> a(String s) {
+-        JsonElement jsonelement = (new JsonParser()).parse(s);
++        JsonElement jsonelement = JsonParser.parseString(s);
+ 
+         if (!jsonelement.isJsonObject()) {
+             return Maps.newHashMap();
+diff --git a/main/java/net/minecraft/server/ThreadWatchdog.java b/main/java/net/minecraft/server/ThreadWatchdog.java
+index 9f08790..51060e8 100644
+--- a/main/java/net/minecraft/server/ThreadWatchdog.java
++++ b/main/java/net/minecraft/server/ThreadWatchdog.java
+@@ -41,7 +41,7 @@ public class ThreadWatchdog implements Runnable {
+                 for (int i1 = 0; i1 < l; ++i1) {
+                     ThreadInfo threadinfo = athreadinfo1[i1];
+ 
+-                    if (threadinfo.getThreadId() == this.b.aM().getId()) {
++                    if (threadinfo.getThreadId() == this.b.aM().threadId()) {
+                         error.setStackTrace(threadinfo.getStackTrace());
+                     }
+ 
+diff --git a/main/java/net/minecraft/server/TileEntity.java b/main/java/net/minecraft/server/TileEntity.java
+index ee2b435..0430230 100644
+--- a/main/java/net/minecraft/server/TileEntity.java
++++ b/main/java/net/minecraft/server/TileEntity.java
+@@ -67,7 +67,7 @@ public abstract class TileEntity {
+             Class oclass = (Class) TileEntity.f.get(nbttagcompound.getString("id"));
+ 
+             if (oclass != null) {
+-                tileentity = (TileEntity) oclass.newInstance();
++                tileentity = (TileEntity) oclass.getConstructor().newInstance();
+             }
+         } catch (Exception exception) {
+             exception.printStackTrace();
+diff --git a/main/java/net/minecraft/server/WorldGenFactory.java b/main/java/net/minecraft/server/WorldGenFactory.java
+index bb7185c..241b40c 100644
+--- a/main/java/net/minecraft/server/WorldGenFactory.java
++++ b/main/java/net/minecraft/server/WorldGenFactory.java
+@@ -38,7 +38,7 @@ public class WorldGenFactory {
+             Class oclass = (Class) WorldGenFactory.b.get(nbttagcompound.getString("id"));
+ 
+             if (oclass != null) {
+-                structurestart = (StructureStart) oclass.newInstance();
++                structurestart = (StructureStart) oclass.getDeclaredConstructor().newInstance();
+             }
+         } catch (Exception exception) {
+             WorldGenFactory.a.warn("Failed Start with id " + nbttagcompound.getString("id"));
+@@ -61,7 +61,7 @@ public class WorldGenFactory {
+             Class oclass = (Class) WorldGenFactory.d.get(nbttagcompound.getString("id"));
+ 
+             if (oclass != null) {
+-                structurepiece = (StructurePiece) oclass.newInstance();
++                structurepiece = (StructurePiece) oclass.getDeclaredConstructor().newInstance();
+             }
+         } catch (Exception exception) {
+             WorldGenFactory.a.warn("Failed Piece with id " + nbttagcompound.getString("id"));
+-- 
+2.45.1
+

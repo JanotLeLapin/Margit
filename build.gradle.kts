@@ -33,6 +33,10 @@ tasks {
     }
 }
 
+tasks.withType<JavaCompile> {
+    options.compilerArgs.add("-Xlint:deprecation")
+}
+
 tasks.jar {
     manifest {
         attributes(mapOf("Manifest-Version" to "1.0", "Main-Class" to "net.minecraft.server.MinecraftServer"))
