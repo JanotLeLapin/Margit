@@ -43,5 +43,8 @@ in mkShell {
     tar -xzvf ${margit-decompiled-jar}
     git -C src add .
     git -C src commit -m "initial commit"
+    for patch in ./patches/*.patch; do
+      git -C src am < $patch
+    done
   '';
 }
