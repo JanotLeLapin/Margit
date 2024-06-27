@@ -9,6 +9,7 @@ Margit is a set of tools and patches that modify the official Minecraft 1.8.8 se
 - use latest dependencies
 - use JDK 22
 - use lightweight green threads
+- console tab completer
 - remove Mojang snooper
 
 ## Usage
