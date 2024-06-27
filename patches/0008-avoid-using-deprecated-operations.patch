@@ -1,38 +1,7 @@
-From 77c26bfdd91b73307cf4a61a42be3aa5b17008f0 Mon Sep 17 00:00:00 2001
 From: Joseph DALY <joseph300905@gmail.com>
 Date: Wed, 26 Jun 2024 19:16:02 +0200
 Subject: [PATCH] avoid using deprecated operations
 
----
- main/java/net/minecraft/server/EntityBat.java      |  2 +-
- main/java/net/minecraft/server/EntityBlaze.java    |  2 +-
- main/java/net/minecraft/server/EntityBoat.java     |  6 +++---
- main/java/net/minecraft/server/EntityEnderman.java |  6 +++---
- main/java/net/minecraft/server/EntityHanging.java  |  3 ++-
- .../minecraft/server/EntityMinecartAbstract.java   | 10 +++++-----
- .../minecraft/server/EntityMinecartFurnace.java    |  2 +-
- main/java/net/minecraft/server/EntitySheep.java    |  2 +-
- main/java/net/minecraft/server/EntitySkeleton.java |  2 +-
- main/java/net/minecraft/server/EntitySpider.java   |  2 +-
- main/java/net/minecraft/server/EntityWither.java   |  8 ++++----
- main/java/net/minecraft/server/EntityWolf.java     |  6 +++---
- main/java/net/minecraft/server/EnumProtocol.java   | 10 ++++++----
- main/java/net/minecraft/server/LocaleLanguage.java |  3 ++-
- main/java/net/minecraft/server/MinecraftKey.java   |  5 +++--
- .../java/net/minecraft/server/MinecraftServer.java |  5 +++--
- .../server/MojangStatisticsGenerator.java          |  6 ++++--
- main/java/net/minecraft/server/NetworkManager.java | 14 +++++++-------
- .../net/minecraft/server/PacketDataSerializer.java |  2 ++
- main/java/net/minecraft/server/PacketDecoder.java  |  2 +-
- main/java/net/minecraft/server/PacketEncoder.java  |  2 +-
- main/java/net/minecraft/server/RegistryBlocks.java |  4 ++--
- main/java/net/minecraft/server/RegistrySimple.java |  6 +++---
- .../net/minecraft/server/ServerConnection.java     |  8 ++++----
- .../minecraft/server/ServerStatisticManager.java   |  7 ++++---
- main/java/net/minecraft/server/ThreadWatchdog.java |  2 +-
- main/java/net/minecraft/server/TileEntity.java     |  2 +-
- .../java/net/minecraft/server/WorldGenFactory.java |  4 ++--
- 28 files changed, 72 insertions(+), 61 deletions(-)
 
 diff --git a/main/java/net/minecraft/server/EntityBat.java b/main/java/net/minecraft/server/EntityBat.java
 index 5241620..62a9a52 100644

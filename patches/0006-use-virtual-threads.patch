@@ -1,19 +1,7 @@
-From 73747e6bb1b85d42ab4b61a374f42f5cfcd0bafa Mon Sep 17 00:00:00 2001
 From: Joseph DALY <joseph300905@gmail.com>
 Date: Wed, 26 Jun 2024 16:00:23 +0200
 Subject: [PATCH] use virtual threads
 
----
- .../net/minecraft/server/BlockBeacon.java     | 41 ++++++-------
- .../net/minecraft/server/DedicatedServer.java | 51 ++++++----------
- .../net/minecraft/server/FileIOThread.java    |  5 +-
- .../net/minecraft/server/HttpUtilities.java   |  3 +-
- .../net/minecraft/server/LoginListener.java   | 60 +++++++++----------
- .../net/minecraft/server/MinecraftServer.java |  5 +-
- .../net/minecraft/server/NetworkManager.java  |  7 +--
- .../server/RemoteConnectionThread.java        |  3 +-
- .../minecraft/server/ServerConnection.java    |  7 +--
- 9 files changed, 77 insertions(+), 105 deletions(-)
 
 diff --git a/main/java/net/minecraft/server/BlockBeacon.java b/main/java/net/minecraft/server/BlockBeacon.java
 index a73d7b1..b83933c 100644

@@ -1,14 +1,10 @@
-From c1a57af52d6b8bb6a9db77c1cf796bb68ad7a7a0 Mon Sep 17 00:00:00 2001
 From: Joseph DALY <joseph300905@gmail.com>
 Date: Wed, 26 Jun 2024 16:30:16 +0200
 Subject: [PATCH] fix log4j configuration file
 
----
- main/resources/log4j2.xml | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
 
 diff --git a/main/resources/log4j2.xml b/main/resources/log4j2.xml
-index 59064b1..d0fde62 100644
+index 59064b1..a159c03 100644
 --- a/main/resources/log4j2.xml
 +++ b/main/resources/log4j2.xml
 @@ -1,12 +1,9 @@

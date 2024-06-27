@@ -1,12 +1,7 @@
-From bad63a782aa825acdf9240aeb710846e1889b4d6 Mon Sep 17 00:00:00 2001
 From: Joseph DALY <joseph300905@gmail.com>
 Date: Tue, 25 Jun 2024 12:28:46 +0200
 Subject: [PATCH] update dependencies
 
----
- .../net/minecraft/server/MinecraftServer.java |   2 +-
- .../server/PacketDataSerializer.java          | 190 +++++++++++++++++-
- 2 files changed, 187 insertions(+), 5 deletions(-)
 
 diff --git a/main/java/net/minecraft/server/MinecraftServer.java b/main/java/net/minecraft/server/MinecraftServer.java
 index 103533c..82c93ad 100644

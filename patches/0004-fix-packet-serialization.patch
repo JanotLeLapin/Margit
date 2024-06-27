@@ -1,11 +1,7 @@
-From cf19a7b9b2129bbc0024f588e02ffd91c525f412 Mon Sep 17 00:00:00 2001
 From: Joseph DALY <joseph300905@gmail.com>
 Date: Wed, 26 Jun 2024 10:20:14 +0200
 Subject: [PATCH] fix packet serialization
 
----
- main/java/net/minecraft/server/PacketDataSerializer.java | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/main/java/net/minecraft/server/PacketDataSerializer.java b/main/java/net/minecraft/server/PacketDataSerializer.java
 index 4463d6e..5c865bc 100644

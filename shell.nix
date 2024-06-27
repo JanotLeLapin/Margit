@@ -9,6 +9,7 @@
 , stdenv
 , callPackage
 , mkShell
+, writeScriptBin
 }: let
   margit-original-jar = fetchurl {
     url = "https://launcher.mojang.com/v1/objects/5fafba3f58c40dc51b5c3ca72a98f62dfdae1db7/server.jar";
@@ -31,9 +32,12 @@
   margit-mapped-jar = callPackage ./remap.nix { inherit margit-original-jar margit-build-data; };
   margit-decompiled-src = callPackage ./decompile.nix { inherit margit-mapped-jar margit-build-data; };
   margit-patched-src = callPackage ./apply-patches.nix { inherit margit-decompiled-src; };
+
+  margit-build-patches = callPackage ./build-patches.nix {};
 in mkShell {
   buildInputs = [
     jdk22 git gnutar jdt-language-server
+    margit-build-patches
   ];
 
   shellHook = ''

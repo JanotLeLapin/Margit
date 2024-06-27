@@ -1,13 +1,7 @@
-From a1c4e3f9fddd253d394a980302e2e1ac3d5d40fb Mon Sep 17 00:00:00 2001
 From: Joseph DALY <joseph300905@gmail.com>
 Date: Tue, 25 Jun 2024 15:14:24 +0200
 Subject: [PATCH] remove gui
 
----
- .../net/minecraft/server/DedicatedServer.java |   1 -
- main/java/net/minecraft/server/ServerGUI.java | 169 ------------------
- 2 files changed, 170 deletions(-)
- delete mode 100644 main/java/net/minecraft/server/ServerGUI.java
 
 diff --git a/main/java/net/minecraft/server/DedicatedServer.java b/main/java/net/minecraft/server/DedicatedServer.java
 index a549dfb..3eaea11 100644

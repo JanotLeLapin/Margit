@@ -1,67 +1,7 @@
-From 0d79e52163582f73e6eb5db104ee75367b9a0489 Mon Sep 17 00:00:00 2001
 From: Joseph DALY <joseph300905@gmail.com>
 Date: Wed, 26 Jun 2024 12:28:46 +0200
 Subject: [PATCH] use jdk22
 
----
- main/java/net/minecraft/server/BiomeBase.java |  2 +-
- main/java/net/minecraft/server/Chunk.java     |  2 +-
- .../minecraft/server/ChunkProviderServer.java |  2 +-
- .../minecraft/server/ChunkRegionLoader.java   |  2 +-
- .../net/minecraft/server/CommandDebug.java    |  2 +-
- .../net/minecraft/server/CommandHandler.java  |  2 +-
- .../net/minecraft/server/CommandTitle.java    |  2 +-
- .../net/minecraft/server/ContainerAnvil.java  |  2 +-
- .../net/minecraft/server/CrashReport.java     |  2 +-
- .../minecraft/server/DedicatedPlayerList.java |  2 +-
- .../net/minecraft/server/DedicatedServer.java |  2 +-
- .../minecraft/server/DispenserRegistry.java   |  2 +-
- main/java/net/minecraft/server/EULA.java      |  2 +-
- .../java/net/minecraft/server/EntityItem.java |  4 +--
- .../net/minecraft/server/EntityPlayer.java    |  2 +-
- .../net/minecraft/server/EntityTracker.java   |  2 +-
- .../minecraft/server/EntityTrackerEntry.java  |  2 +-
- .../net/minecraft/server/EntityTypes.java     |  2 +-
- .../net/minecraft/server/EnumProtocol.java    |  2 +-
- .../minecraft/server/GenLayerRegionHills.java |  2 +-
- .../minecraft/server/GenericAttributes.java   |  2 +-
- .../net/minecraft/server/HttpUtilities.java   |  2 +-
- main/java/net/minecraft/server/JsonList.java  |  2 +-
- .../minecraft/server/LegacyPingHandler.java   |  2 +-
- .../net/minecraft/server/LocaleLanguage.java  | 27 ++++++++-----------
- .../net/minecraft/server/LoginListener.java   |  2 +-
- .../net/minecraft/server/MethodProfiler.java  |  2 +-
- .../minecraft/server/MinecraftEncryption.java |  2 +-
- .../net/minecraft/server/MinecraftServer.java |  2 +-
- main/java/net/minecraft/server/MobEffect.java |  2 +-
- .../net/minecraft/server/MojangsonParser.java |  2 +-
- .../java/net/minecraft/server/NBTTagList.java |  2 +-
- .../server/NameReferencingFileConverter.java  |  2 +-
- .../net/minecraft/server/NetworkManager.java  |  2 +-
- .../net/minecraft/server/PacketDecoder.java   |  2 +-
- .../net/minecraft/server/PacketEncoder.java   |  2 +-
- ...GoalNearestAttackableTargetInsentient.java |  2 +-
- .../server/PathfinderGoalSelector.java        |  2 +-
- .../PathfinderGoalTargetNearestPlayer.java    |  2 +-
- .../server/PersistentScoreboard.java          |  2 +-
- .../net/minecraft/server/PlayerChunkMap.java  |  2 +-
- .../minecraft/server/PlayerConnection.java    |  2 +-
- .../java/net/minecraft/server/PlayerList.java |  2 +-
- .../net/minecraft/server/PropertyManager.java |  2 +-
- .../net/minecraft/server/RedirectStream.java  |  2 +-
- .../net/minecraft/server/RegistrySimple.java  |  2 +-
- .../server/RemoteControlSession.java          |  4 +--
- .../minecraft/server/ServerConnection.java    |  2 +-
- .../server/ServerStatisticManager.java        |  2 +-
- .../net/minecraft/server/ThreadWatchdog.java  |  2 +-
- .../java/net/minecraft/server/TileEntity.java |  2 +-
- .../minecraft/server/WorldGenDungeons.java    |  2 +-
- .../net/minecraft/server/WorldGenFactory.java |  2 +-
- .../net/minecraft/server/WorldLoader.java     |  2 +-
- .../minecraft/server/WorldLoaderServer.java   |  2 +-
- .../net/minecraft/server/WorldNBTStorage.java |  2 +-
- .../net/minecraft/server/WorldServer.java     |  2 +-
- 57 files changed, 69 insertions(+), 74 deletions(-)
 
 diff --git a/main/java/net/minecraft/server/BiomeBase.java b/main/java/net/minecraft/server/BiomeBase.java
 index c01a400..2285ada 100644
