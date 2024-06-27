@@ -41,8 +41,12 @@ in mkShell {
   ];
 
   shellHook = ''
-    rm -rf src
-    mkdir -p src
-    tar -xzf ${margit-patched-src}/patched.tar.gz -C src
+    if [ ! -d "src" ]; then
+      mkdir -p src
+      tar -xzf ${margit-patched-src}/patched.tar.gz -C src
+      echo "Initialized src"
+    else
+      echo "Skipping src initialization"
+    fi
   '';
 }
