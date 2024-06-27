@@ -1,0 +1,73 @@
+From: Margit <auto@margit.com>
+Date: Thu, 27 Jun 2024 13:19:17 +0200
+Subject: [PATCH] use jline
+
+
+diff --git a/main/java/net/minecraft/server/DedicatedServer.java b/main/java/net/minecraft/server/DedicatedServer.java
+index d24af9a..18a23a0 100644
+--- a/main/java/net/minecraft/server/DedicatedServer.java
++++ b/main/java/net/minecraft/server/DedicatedServer.java
+@@ -14,6 +14,11 @@ import java.util.concurrent.Callable;
+ import java.util.concurrent.TimeUnit;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
++import org.jline.reader.LineReader;
++import org.jline.reader.LineReaderBuilder;
++import org.jline.terminal.Terminal;
++import org.jline.terminal.TerminalBuilder;
++import io.margit.appender.JLineAppender;
+ 
+ public class DedicatedServer extends MinecraftServer implements IMinecraftServer {
+ 
+@@ -41,16 +46,14 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
+     }
+ 
+     protected boolean init() throws IOException {
+-        Thread thread = Thread.ofVirtual().name("console-handler").start(() -> {
+-            BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(System.in));
+-            String s;
++        final Terminal terminal = TerminalBuilder.builder().system(true).build();
++        final LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
++        JLineAppender.setReader(reader);
+ 
+-            try {
+-                while (!DedicatedServer.this.isStopped() && DedicatedServer.this.isRunning() && (s = bufferedreader.readLine()) != null) {
+-                    DedicatedServer.this.issueCommand(s, DedicatedServer.this);
+-                }
+-            } catch (IOException ioexception) {
+-                DedicatedServer.LOGGER.error("Exception handling console input", ioexception);
++        Thread thread = Thread.ofVirtual().name("console-handler").start(() -> {
++            while (!DedicatedServer.this.isStopped() && DedicatedServer.this.isRunning()) {
++                String command = reader.readLine(JLineAppender.PROMPT);
++                DedicatedServer.this.issueCommand(command, DedicatedServer.this);
+             }
+         });
+ 
+diff --git a/main/resources/log4j2.xml b/main/resources/log4j2.xml
+index a159c03..cb48c19 100644
+--- a/main/resources/log4j2.xml
++++ b/main/resources/log4j2.xml
+@@ -1,9 +1,9 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <Configuration status="WARN">
+     <Appenders>
+-        <Console name="SysOut" target="SYSTEM_OUT">
++        <JLineAppender name="JLineAppender">
+             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %msg%n" />
+-        </Console>
++        </JLineAppender>
+         <RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz">
+             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %msg%n" />
+             <Policies>
+@@ -17,7 +17,7 @@
+             <filters>
+                 <MarkerFilter marker="NETWORK_PACKETS" onMatch="DENY" onMismatch="NEUTRAL" />
+             </filters>
+-            <AppenderRef ref="SysOut"/>
++            <AppenderRef ref="JLineAppender"/>
+             <AppenderRef ref="File"/>
+         </Root>
+     </Loggers>
+-- 
+2.45.1
+

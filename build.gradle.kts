@@ -16,9 +16,13 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("commons-io:commons-io:2.16.1")
     implementation("com.mojang:authlib:3.4.40")
-    implementation("org.apache.logging.log4j:log4j-api:2.23.1")
+
+    implementation("org.jline:jline:3.26.2")
+
+    compileOnly("org.apache.logging.log4j:log4j-api:2.23.1")
     implementation("org.apache.logging.log4j:log4j-core:2.23.1")
     implementation("org.apache.logging.log4j:log4j-slf4j18-impl:2.18.0") // com.mojang.authlib
+    implementation(project(":appender"))
 }
 
 java {
@@ -41,4 +45,9 @@ tasks.jar {
     manifest {
         attributes(mapOf("Manifest-Version" to "1.0", "Main-Class" to "net.minecraft.server.MinecraftServer"))
     }
+}
+
+tasks.shadowJar {
+    transform(com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer::class.java)
+    mergeServiceFiles()
 }
