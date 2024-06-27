@@ -16,6 +16,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("commons-io:commons-io:2.16.1")
     implementation("com.mojang:authlib:3.4.40")
+    implementation("org.tomlj:tomlj:1.1.1")
 
     implementation("org.jline:jline:3.26.2")
 

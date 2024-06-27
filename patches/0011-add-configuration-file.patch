@@ -1,0 +1,86 @@
+From: Margit <auto@margit.com>
+Date: Thu, 27 Jun 2024 23:17:00 +0200
+Subject: [PATCH] add configuration file
+
+
+diff --git a/main/java/io/margit/Config.java b/main/java/io/margit/Config.java
+new file mode 100644
+index 0000000..9f0ccdb
+--- /dev/null
++++ b/main/java/io/margit/Config.java
+@@ -0,0 +1,25 @@
++package io.margit;
++
++import org.tomlj.Toml;
++import org.tomlj.TomlParseResult;
++import java.io.IOException;
++import java.nio.file.Path;
++
++public class Config {
++  private final String shutdownMessage;
++  
++  public Config(Path path) {
++    TomlParseResult res;
++    try {
++      res = Toml.parse(path);
++    } catch (IOException e) {
++      net.minecraft.server.MinecraftServer.LOGGER.info("Couldn't read Margit configuration file");
++      res = Toml.parse("");
++    }
++    this.shutdownMessage = res.getString("messages.shutdown");
++  }
++
++  public String getShutdownMessage() {
++    return shutdownMessage == null ? "Server closed" : shutdownMessage;
++  }
++}
+diff --git a/main/java/net/minecraft/server/MinecraftServer.java b/main/java/net/minecraft/server/MinecraftServer.java
+index f42679b..b293de0 100644
+--- a/main/java/net/minecraft/server/MinecraftServer.java
++++ b/main/java/net/minecraft/server/MinecraftServer.java
+@@ -18,6 +18,7 @@ import java.awt.GraphicsEnvironment;
+ import java.awt.image.BufferedImage;
+ import java.io.File;
+ import java.io.IOException;
++import java.nio.file.Paths;
+ import java.net.Proxy;
+ import java.security.KeyPair;
+ import java.text.SimpleDateFormat;
+@@ -38,11 +39,13 @@ import javax.imageio.ImageIO;
+ import org.apache.commons.lang3.Validate;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
++import io.margit.Config;
+ 
+ public abstract class MinecraftServer implements Runnable, ICommandListener, IAsyncTaskHandler {
+ 
+     public static final Logger LOGGER = LogManager.getLogger(MinecraftServer.class);
+     public static final File a = new File("usercache.json");
++    public static Config config;
+     private static MinecraftServer l;
+     public Convertable convertable;
+     public File universe;
+@@ -337,6 +340,7 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+     public void run() {
+         try {
+             if (this.init()) {
++                MinecraftServer.config = new Config(Paths.get("config.toml"));
+                 this.ab = az();
+                 long i = 0L;
+ 
+diff --git a/main/java/net/minecraft/server/PlayerList.java b/main/java/net/minecraft/server/PlayerList.java
+index 56a534a..be0fbe7 100644
+--- a/main/java/net/minecraft/server/PlayerList.java
++++ b/main/java/net/minecraft/server/PlayerList.java
+@@ -751,7 +751,7 @@ public abstract class PlayerList {
+ 
+     public void u() {
+         for (int i = 0; i < this.players.size(); ++i) {
+-            ((EntityPlayer) this.players.get(i)).playerConnection.disconnect("Server closed");
++            ((EntityPlayer) this.players.get(i)).playerConnection.disconnect(MinecraftServer.config.getShutdownMessage());
+         }
+ 
+     }
+-- 
+2.45.1
+
