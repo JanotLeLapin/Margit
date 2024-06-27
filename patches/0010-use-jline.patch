@@ -4,22 +4,48 @@ Subject: [PATCH] use jline
 
 
 diff --git a/main/java/net/minecraft/server/DedicatedServer.java b/main/java/net/minecraft/server/DedicatedServer.java
-index d24af9a..18a23a0 100644
+index d24af9a..a4fb87a 100644
 --- a/main/java/net/minecraft/server/DedicatedServer.java
 +++ b/main/java/net/minecraft/server/DedicatedServer.java
-@@ -14,6 +14,11 @@ import java.util.concurrent.Callable;
+@@ -14,6 +14,14 @@ import java.util.concurrent.Callable;
  import java.util.concurrent.TimeUnit;
  import org.apache.logging.log4j.LogManager;
  import org.apache.logging.log4j.Logger;
++import org.jline.reader.Candidate;
++import org.jline.reader.Completer;
 +import org.jline.reader.LineReader;
 +import org.jline.reader.LineReaderBuilder;
++import org.jline.reader.ParsedLine;
 +import org.jline.terminal.Terminal;
 +import org.jline.terminal.TerminalBuilder;
 +import io.margit.appender.JLineAppender;
  
  public class DedicatedServer extends MinecraftServer implements IMinecraftServer {
  
-@@ -41,16 +46,14 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
+@@ -27,6 +35,22 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
+     private WorldSettings.EnumGamemode r;
+     private boolean s;
+ 
++    private static class CommandCompleter implements Completer {
++        private final DedicatedServer server;
++
++        public CommandCompleter(DedicatedServer server) {
++            this.server = server;
++        }
++        
++        public void complete(LineReader reader, ParsedLine line, List<Candidate> candidates) {
++            String str = line.line();
++            List<String> lst = this.server.tabCompleteCommand(this.server, "/" + str, new BlockPosition(0, 0, 0));
++            for (String candidate : lst) {
++                candidates.add(new Candidate(candidate.startsWith("/") ? candidate.substring(1) : candidate));
++            }
++        }
++    }
++
+     public DedicatedServer(File file) {
+         super(file, Proxy.NO_PROXY, DedicatedServer.a);
+         Thread thread = Thread.ofVirtual().name("infinisleeper").start(() -> {
+@@ -41,16 +65,14 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
      }
  
      protected boolean init() throws IOException {
@@ -27,7 +53,7 @@ index d24af9a..18a23a0 100644
 -            BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(System.in));
 -            String s;
 +        final Terminal terminal = TerminalBuilder.builder().system(true).build();
-+        final LineReader reader = LineReaderBuilder.builder().terminal(terminal).build();
++        final LineReader reader = LineReaderBuilder.builder().completer(new CommandCompleter(this)).terminal(terminal).build();
 +        JLineAppender.setReader(reader);
  
 -            try {
@@ -44,7 +70,7 @@ index d24af9a..18a23a0 100644
          });
  
 diff --git a/main/resources/log4j2.xml b/main/resources/log4j2.xml
-index a159c03..cb48c19 100644
+index a159c03..78f1cff 100644
 --- a/main/resources/log4j2.xml
 +++ b/main/resources/log4j2.xml
 @@ -1,9 +1,9 @@
