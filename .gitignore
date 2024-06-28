@@ -4,5 +4,9 @@ build
 classes
 src/
 
+# lsp
+.jdtls
 .project
 .settings
+.classpath
+.factorypath

@@ -1,6 +1,5 @@
 { jdk8
-, jdk22
-, jdt-language-server
+, jdk21
 , unzip
 , gnutar
 , git
@@ -29,6 +28,8 @@
     mapPath = key: "${repo}/mappings/${builtins.getAttr key (builtins.fromJSON (builtins.readFile "${repo}/info.json"))}";
   };
 
+  lsp = callPackage ./lsp.nix {};
+
   margit-mapped-jar = callPackage ./remap.nix { inherit margit-original-jar margit-build-data; };
   margit-decompiled-src = callPackage ./decompile.nix { inherit margit-mapped-jar margit-build-data; };
   margit-patched-src = callPackage ./apply-patches.nix { inherit margit-decompiled-src; };
@@ -36,8 +37,8 @@
   margit-build-patches = callPackage ./build-patches.nix {};
 in mkShell {
   buildInputs = [
-    jdk22 git gnutar jdt-language-server
-    margit-build-patches
+    jdk21 git gnutar
+    lsp margit-build-patches
   ];
 
   shellHook = ''
