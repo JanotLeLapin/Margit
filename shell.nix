@@ -1,5 +1,7 @@
 { jdk8
 , jdk21
+, rust-bin
+, rust-analyzer
 , unzip
 , gnutar
 , git
@@ -37,8 +39,10 @@
   margit-build-patches = callPackage ./build-patches.nix {};
 in mkShell {
   buildInputs = [
-    jdk21 git gnutar
-    lsp margit-build-patches
+    jdk21 (rust-bin.fromRustupToolchainFile ./proxy/rust-toolchain.toml)
+    lsp rust-analyzer
+    git gnutar
+    margit-build-patches
   ];
 
   shellHook = ''
