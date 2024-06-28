@@ -1,4 +1,4 @@
-use bytes::{Buf, Bytes};
+use bytes::{Buf, BufMut, Bytes, BytesMut};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -27,6 +27,14 @@ pub fn read_varint(bytes: &mut Bytes) -> Result<i32, VarLenError> {
     Ok(res)
 }
 
+pub fn write_varint(bytes: &mut BytesMut, mut value: i32) {
+    while value >= 0x80 {
+        bytes.put_u8((value as u8) | 0x80);
+        value >>= 7;
+    }
+    bytes.put_u8(value as u8);
+}
+
 #[derive(Error, Debug)]
 pub enum StringError {
     #[error("String length too big")]
@@ -40,4 +48,10 @@ pub fn read_string(bytes: &mut Bytes) -> Result<String, StringError> {
         res[i] = bytes.get_u8();
     }
     Ok(String::from_utf8_lossy(&res).to_string())
+}
+
+pub fn write_string(bytes: &mut BytesMut, value: &str) {
+    let data = value.as_bytes();
+    write_varint(bytes, data.len() as i32);
+    bytes.put_slice(data);
 }

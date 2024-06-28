@@ -1,3 +1,4 @@
+mod packet;
 mod util;
 
 use std::error::Error;
@@ -40,6 +41,7 @@ pub async fn client(mut socket: TcpStream) -> Result<(), Box<dyn Error>> {
 
         let mut data = vec![0u8; size];
         socket.read(&mut data).await?;
+        println!("{data:?}");
         let mut data = Bytes::from(data);
 
         let id = util::read_varint(&mut data)?;
@@ -58,12 +60,17 @@ pub async fn client(mut socket: TcpStream) -> Result<(), Box<dyn Error>> {
                 _ => unimplemented!("unknown id at handshake: {id}"),
             },
             ClientState::Status => match id {
-                0x00 => unimplemented!("status request"),
+                0x00 => packet::status::status::handle(&mut socket).await?,
+                0x01 => {
+                    packet::status::ping::handle(&mut socket, &mut data).await?;
+                    break;
+                }
                 _ => unimplemented!("unknown id at status: {id}"),
             },
             _ => {}
         }
     }
+    Ok(())
 }
 
 #[tokio::main]
