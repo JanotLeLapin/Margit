@@ -1,11 +1,10 @@
-.gradle
-build
+.gradle/
+build/
 
-classes
 src/
 
 # lsp
-.jdtls
+.jdtls/
 .project
 .settings
 .classpath
