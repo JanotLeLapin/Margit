@@ -1,0 +1,166 @@
+From: Margit <auto@margit.com>
+Date: Wed, 25 Sep 2024 18:06:06 +0200
+Subject: [PATCH] event manager
+
+
+diff --git a/main/java/io/margit/MargitEventManager.java b/main/java/io/margit/MargitEventManager.java
+new file mode 100644
+index 0000000..90fc3be
+--- /dev/null
++++ b/main/java/io/margit/MargitEventManager.java
+@@ -0,0 +1,53 @@
++package io.margit;
++
++import java.lang.reflect.Method;
++import java.util.ArrayList;
++import java.util.HashMap;
++import java.util.List;
++import java.util.Map;
++
++import io.margit.api.EventManager;
++import io.margit.api.event.Subscribe;
++
++public class MargitEventManager implements EventManager {
++  public static class Listener {
++    final Object obj;
++    final Method method;
++
++    public Listener(Object obj, Method method) {
++      this.obj = obj;
++      this.method = method;
++    }
++  }
++
++  private final Map<Class<?>, List<Listener>> listeners = new HashMap<>();
++
++  public void register(Object listener) {
++    Class<?> clazz = listener.getClass();
++    for (Method method : clazz.getDeclaredMethods()) {
++      if (method.isAnnotationPresent(Subscribe.class) && method.getParameterCount() == 1) {
++        this.registerListener(method.getParameterTypes()[0], listener, method);
++      }
++    }
++  }
++
++  public void registerListener(Class<?> event, Object listener, Method method) {
++    this.listeners.computeIfAbsent(event, k -> new ArrayList<>());
++    this.listeners.get(event).add(new Listener(listener, method));
++  }
++
++  public void fireEvent(Object event) {
++    List<Listener> listeners = this.listeners.get(event.getClass());
++    if (listeners == null) {
++      return;
++    }
++
++    for (Listener listener : listeners) {
++      try {
++        listener.method.invoke(listener.obj, event);
++      } catch (Exception e) {
++        e.printStackTrace();
++      }
++    }
++  }
++}
+diff --git a/main/java/io/margit/MargitServer.java b/main/java/io/margit/MargitServer.java
+index 5b1eb3f..48b427d 100644
+--- a/main/java/io/margit/MargitServer.java
++++ b/main/java/io/margit/MargitServer.java
+@@ -18,12 +18,14 @@ import java.util.jar.JarFile;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
++import io.margit.api.EventManager;
+ import io.margit.api.Mod;
+ import io.margit.api.Server;
+ import net.minecraft.server.MinecraftServer;
+ 
+ public class MargitServer implements Server {
+   public static final Logger LOGGER = LogManager.getLogger(MargitServer.class);
++  private final MargitEventManager eventManager;
+   private final Config config;
+   private final MinecraftServer server;
+   private final Collection<Mod> mods = new HashSet<>();
+@@ -37,6 +39,7 @@ public class MargitServer implements Server {
+ 
+   public MargitServer(MinecraftServer server, Config config) {
+     this.server = server;
++    this.eventManager = new MargitEventManager();
+     this.config = config;
+   }
+ 
+@@ -86,7 +89,7 @@ public class MargitServer implements Server {
+ 
+       Injector injector = Guice.createInjector(new ServerModule());
+       Object obj = injector.getInstance(clazz);
+-      System.out.println(obj);
++      this.eventManager.register(obj);
+     }
+   }
+   
+@@ -95,6 +98,11 @@ public class MargitServer implements Server {
+     System.out.println("I can't do that yet");
+   }
+ 
++  @Override
++  public MargitEventManager getEventmManager() {
++  	return this.eventManager;
++  }
++
+   public Config getConfig() {
+   	return config;
+   }
+diff --git a/main/java/net/minecraft/server/MinecraftServer.java b/main/java/net/minecraft/server/MinecraftServer.java
+index 0275ec3..d61a245 100644
+--- a/main/java/net/minecraft/server/MinecraftServer.java
++++ b/main/java/net/minecraft/server/MinecraftServer.java
+@@ -41,6 +41,7 @@ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ import io.margit.Config;
+ import io.margit.MargitServer;
++import io.margit.api.event.ServerInitializeEvent;
+ 
+ public abstract class MinecraftServer implements Runnable, ICommandListener, IAsyncTaskHandler {
+ 
+@@ -109,6 +110,10 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+         this.V = new YggdrasilAuthenticationService(proxy, UUID.randomUUID().toString());
+         this.W = this.V.createMinecraftSessionService();
+         this.Y = this.V.createProfileRepository();
++
++        Config config = new Config(Paths.get("config.toml"));
++        MinecraftServer.margit = new MargitServer(this, config);
++        MinecraftServer.margit.loadMods(new File("mods"));
+     }
+ 
+     protected CommandDispatcher h() {
+@@ -341,10 +346,6 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+     public void run() {
+         try {
+             if (this.init()) {
+-                Config config = new Config(Paths.get("config.toml"));
+-                MinecraftServer.margit = new MargitServer(this, config);
+-                MinecraftServer.margit.loadMods(new File("mods"));
+-
+                 this.ab = az();
+                 long i = 0L;
+ 
+@@ -352,6 +353,8 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+                 this.r.setServerInfo(new ServerPing.ServerData("1.8.8", 47));
+                 this.a(this.r);
+ 
++                MinecraftServer.margit.getEventmManager().fireEvent(new ServerInitializeEvent());
++
+                 while (this.isRunning) {
+                     long j = az();
+                     long k = j - this.ab;
+@@ -415,7 +418,6 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+             }
+ 
+         }
+-
+     }
+ 
+     private void a(ServerPing serverping) {
+-- 
+2.45.1
+
