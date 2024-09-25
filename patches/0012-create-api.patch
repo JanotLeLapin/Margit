@@ -1,0 +1,182 @@
+From: Margit <auto@margit.com>
+Date: Wed, 25 Sep 2024 17:05:01 +0200
+Subject: [PATCH] create api
+
+
+diff --git a/main/java/io/margit/MargitServer.java b/main/java/io/margit/MargitServer.java
+new file mode 100644
+index 0000000..5b1eb3f
+--- /dev/null
++++ b/main/java/io/margit/MargitServer.java
+@@ -0,0 +1,101 @@
++package io.margit;
++
++import com.google.inject.AbstractModule;
++import com.google.inject.Guice;
++import com.google.inject.Injector;
++import com.google.inject.Provides;
++
++import java.io.File;
++import java.io.IOException;
++import java.net.URL;
++import java.net.URLClassLoader;
++import java.util.Collection;
++import java.util.Enumeration;
++import java.util.HashSet;
++import java.util.jar.JarEntry;
++import java.util.jar.JarFile;
++
++import org.apache.logging.log4j.LogManager;
++import org.apache.logging.log4j.Logger;
++
++import io.margit.api.Mod;
++import io.margit.api.Server;
++import net.minecraft.server.MinecraftServer;
++
++public class MargitServer implements Server {
++  public static final Logger LOGGER = LogManager.getLogger(MargitServer.class);
++  private final Config config;
++  private final MinecraftServer server;
++  private final Collection<Mod> mods = new HashSet<>();
++
++  static class ServerModule extends AbstractModule {
++    @Provides
++    static Server provideServer() {
++      return MinecraftServer.margit;
++    }
++  }
++
++  public MargitServer(MinecraftServer server, Config config) {
++    this.server = server;
++    this.config = config;
++  }
++
++  public void loadMods(File dir) {
++    if (!dir.exists() || !dir.isDirectory()) {
++      LOGGER.warn("Mods directory not found");
++      return;
++    }
++
++    File[] jars = dir.listFiles((_dir, name) -> name.endsWith(".jar"));
++    if (jars == null || jars.length == 0) {
++      return;
++    }
++
++    for (File file : jars) {
++      try {
++        loadMod(file);
++      } catch (Exception e) {
++        e.printStackTrace();
++      }
++    }
++  }
++
++  private void loadMod(File file) throws IOException, ClassNotFoundException {
++    URL url = file.toURI().toURL();
++    try (URLClassLoader loader = new URLClassLoader(new URL[]{ url }, this.getClass().getClassLoader())) {
++      try (JarFile jar = new JarFile(file)) {
++        Enumeration<JarEntry> entries = jar.entries();
++
++        while (entries.hasMoreElements()) {
++          JarEntry entry = entries.nextElement();
++          if (entry.getName().endsWith(".class")) {
++            String className = entry.getName().replace('/', '.').replace(".class", "");
++            loadModClass(loader, className);
++          }
++        }
++      }
++    }
++  }
++
++  private void loadModClass(URLClassLoader loader, String className) throws IOException, ClassNotFoundException {
++    Class<?> clazz = loader.loadClass(className);
++
++    if (clazz.isAnnotationPresent(Mod.class)) {
++      Mod modInfo = clazz.getAnnotation(Mod.class);
++      LOGGER.info("Loading mod " + modInfo.name() + " (" + modInfo.id() + ")");
++
++      Injector injector = Guice.createInjector(new ServerModule());
++      Object obj = injector.getInstance(clazz);
++      System.out.println(obj);
++    }
++  }
++  
++  @Override
++  public void broadcastMessage(String message) {
++    System.out.println("I can't do that yet");
++  }
++
++  public Config getConfig() {
++  	return config;
++  }
++}
+diff --git a/main/java/io/margit/entity/MargitPlayer.java b/main/java/io/margit/entity/MargitPlayer.java
+new file mode 100644
+index 0000000..013627f
+--- /dev/null
++++ b/main/java/io/margit/entity/MargitPlayer.java
+@@ -0,0 +1,17 @@
++package io.margit.entity;
++
++import io.margit.api.entity.Player;
++import net.minecraft.server.EntityPlayer;
++
++public class MargitPlayer implements Player {
++  private final EntityPlayer player;
++  
++  public MargitPlayer(EntityPlayer player) {
++    this.player = player;
++  }
++
++  @Override
++  public String getName() {
++  	return this.player.getName();
++  }
++}
+diff --git a/main/java/net/minecraft/server/MinecraftServer.java b/main/java/net/minecraft/server/MinecraftServer.java
+index b293de0..0275ec3 100644
+--- a/main/java/net/minecraft/server/MinecraftServer.java
++++ b/main/java/net/minecraft/server/MinecraftServer.java
+@@ -40,12 +40,13 @@ import org.apache.commons.lang3.Validate;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ import io.margit.Config;
++import io.margit.MargitServer;
+ 
+ public abstract class MinecraftServer implements Runnable, ICommandListener, IAsyncTaskHandler {
+ 
+     public static final Logger LOGGER = LogManager.getLogger(MinecraftServer.class);
+     public static final File a = new File("usercache.json");
+-    public static Config config;
++    public static MargitServer margit;
+     private static MinecraftServer l;
+     public Convertable convertable;
+     public File universe;
+@@ -340,7 +341,10 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+     public void run() {
+         try {
+             if (this.init()) {
+-                MinecraftServer.config = new Config(Paths.get("config.toml"));
++                Config config = new Config(Paths.get("config.toml"));
++                MinecraftServer.margit = new MargitServer(this, config);
++                MinecraftServer.margit.loadMods(new File("mods"));
++
+                 this.ab = az();
+                 long i = 0L;
+ 
+diff --git a/main/java/net/minecraft/server/PlayerList.java b/main/java/net/minecraft/server/PlayerList.java
+index be0fbe7..9482315 100644
+--- a/main/java/net/minecraft/server/PlayerList.java
++++ b/main/java/net/minecraft/server/PlayerList.java
+@@ -751,7 +751,7 @@ public abstract class PlayerList {
+ 
+     public void u() {
+         for (int i = 0; i < this.players.size(); ++i) {
+-            ((EntityPlayer) this.players.get(i)).playerConnection.disconnect(MinecraftServer.config.getShutdownMessage());
++            ((EntityPlayer) this.players.get(i)).playerConnection.disconnect(MinecraftServer.margit.getConfig().getShutdownMessage());
+         }
+ 
+     }
+-- 
+2.45.1
+

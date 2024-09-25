@@ -24,6 +24,7 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.23.1")
     implementation("org.apache.logging.log4j:log4j-slf4j18-impl:2.18.0") // com.mojang.authlib
     implementation(project(":appender"))
+    implementation(project(":api"))
 }
 
 java {
