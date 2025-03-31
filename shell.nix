@@ -1,5 +1,5 @@
 { jdk8
-, jdk21
+, jdk23
 , unzip
 , gnutar
 , git
@@ -37,7 +37,7 @@
   margit-build-patches = callPackage ./build-patches.nix {};
 in mkShell {
   buildInputs = [
-    jdk21 git gnutar
+    jdk23 git gnutar
     lsp margit-build-patches
   ];
 
