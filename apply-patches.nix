@@ -13,9 +13,7 @@
     git config user.email "auto@margit.com"
     git config user.name "Margit"
     git commit -m "initial commit"
-    for patch in ${./patches}/*.patch; do
-      git am --3way --ignore-space-change < $patch
-    done
+    git am --3way --ignore-whitespace ${./patches}/*.patch
     tar -czvf patched.tar.gz main .git
   '';
   installPhase = ''
