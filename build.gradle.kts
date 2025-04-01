@@ -15,6 +15,10 @@ dependencies {
     implementation("io.netty:netty-all:4.1.111.Final")
     implementation("org.apache.commons:commons-lang3:3.14.0")
     implementation("commons-io:commons-io:2.16.1")
+    implementation("net.sf.jopt-simple:jopt-simple:5.0.4")
+    implementation("org.fusesource.jansi:jansi:2.4.1")
+    implementation("org.jline:jline:3.29.0")
+    implementation("org.yaml:snakeyaml:2.4")
     implementation("com.mojang:authlib:3.4.40")
     implementation("org.tomlj:tomlj:1.1.1")
 
@@ -39,7 +43,8 @@ tasks {
 }
 
 tasks.withType<JavaCompile> {
-    options.compilerArgs.add("-Xlint:deprecation")
+    // options.compilerArgs.add("-Xlint:deprecation")
+    options.compilerArgs.add("-nowarn")
 }
 
 tasks.jar {
