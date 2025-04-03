@@ -17,8 +17,7 @@
     git config user.name "Margit"
     git add .
     git commit -m "initial commit"
-    git am --3way --ignore-whitespace ${./bukkit-patches}/*.patch
-    git am --3way --ignore-whitespace ${./spigot-api-patches}/*.patch
+    git am --3way --ignore-whitespace ${./api-patches}/*.patch
     cd ..
 
     mkdir nms
@@ -42,8 +41,7 @@
     git config user.name "Margit"
     git add .
     git commit -m "add nms"
-    git am --3way --ignore-whitespace ${./craftbukkit-patches}/*.patch
-    git am --3way --ignore-whitespace ${./spigot-server-patches}/*.patch
+    git am --3way --ignore-whitespace ${./server-patches}/*.patch
     cd ..
   '';
   installPhase = ''

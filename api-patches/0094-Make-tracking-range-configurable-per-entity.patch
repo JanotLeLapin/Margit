@@ -1,0 +1,35 @@
+From: RoccoDev <hey@rocco.dev>
+Date: Tue, 9 Nov 2021 18:57:27 +0100
+Subject: [PATCH] Make tracking range configurable per-entity
+
+
+diff --git a/src/main/java/org/bukkit/entity/Entity.java b/src/main/java/org/bukkit/entity/Entity.java
+index 0a8a885..30b049f 100644
+--- a/src/main/java/org/bukkit/entity/Entity.java
++++ b/src/main/java/org/bukkit/entity/Entity.java
+@@ -341,6 +341,22 @@ public interface Entity extends Metadatable, CommandSender {
+      */
+     public boolean isCustomNameVisible();
+ 
++    // KigPaper start
++    /**
++     * Returns the tracking range configured for this entity.
++     * The tracking range is the max distance the player can be from the entity until it can no longer be seen.
++     */
++    int getTrackingRange();
++
++    /**
++     * Sets a new tracking range for this entity.
++     * The tracking range is the max distance the player can be from the entity until it can no longer be seen.
++     *
++     * @param trackingRange the new tracking range, or 0 to reset to the server-configured value.
++     */
++    void setTrackingRange(int trackingRange);
++    // KigPaper end
++
+     // Spigot Start
+     public class Spigot
+     {
+-- 
+2.48.1
+

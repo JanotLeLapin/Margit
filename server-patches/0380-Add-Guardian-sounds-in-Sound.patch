@@ -1,0 +1,32 @@
+From: RoccoDev <hey@rocco.dev>
+Date: Tue, 14 Dec 2021 18:07:11 +0100
+Subject: [PATCH] Add Guardian sounds in Sound
+
+
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftSound.java b/src/main/java/org/bukkit/craftbukkit/CraftSound.java
+index 0cc8f9b..7b6fee6 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftSound.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftSound.java
+@@ -216,6 +216,19 @@ public class CraftSound {
+         // Tile
+         set(PISTON_EXTEND, "tile.piston.out");
+         set(PISTON_RETRACT, "tile.piston.in");
++        // KigPaper start - Guardian sounds
++        set(GUARDIAN_IDLE, "mob.guardian.idle");
++        set(GUARDIAN_IDLE_LAND, "mob.guardian.land.idle");
++        set(GUARDIAN_IDLE_ELDER, "mob.guardian.elder.idle");
++        set(GUARDIAN_HIT, "mob.guardian.hit");
++        set(GUARDIAN_HIT_LAND, "mob.guardian.land.hit");
++        set(GUARDIAN_HIT_ELDER, "mob.guardian.elder.hit");
++        set(GUARDIAN_DEATH, "mob.guardian.death");
++        set(GUARDIAN_DEATH_LAND, "mob.guardian.land.death");
++        set(GUARDIAN_DEATH_ELDER, "mob.guardian.elder.death");
++        set(GUARDIAN_FLOP, "mob.guardian.flop");
++        set(GUARDIAN_CURSE, "mob.guardian.curse");
++        // KigPaper end
+     }
+ 
+     private static void set(Sound sound, String key) {
+-- 
+2.48.1
+

@@ -1,0 +1,36 @@
+From: RoccoDev <hey@rocco.dev>
+Date: Thu, 3 Feb 2022 17:33:24 +0100
+Subject: [PATCH] Make ChunkCoordComparator package-private
+
+
+diff --git a/src/main/java/net/minecraft/server/PlayerChunkMap.java b/src/main/java/net/minecraft/server/PlayerChunkMap.java
+index 285de1b..aeb47e0 100644
+--- a/src/main/java/net/minecraft/server/PlayerChunkMap.java
++++ b/src/main/java/net/minecraft/server/PlayerChunkMap.java
+@@ -558,7 +558,8 @@ public class PlayerChunkMap {
+     }
+ 
+     // CraftBukkit start - Sorter to load nearby chunks first
+-    private static class ChunkCoordComparator implements java.util.Comparator<ChunkCoordIntPair> {
++    // KigPaper - private -> package-private
++    static class ChunkCoordComparator implements java.util.Comparator<ChunkCoordIntPair> {
+         private int x;
+         private int z;
+ 
+@@ -567,6 +568,13 @@ public class PlayerChunkMap {
+             z = (int) entityplayer.locZ >> 4;
+         }
+ 
++        // KigPaper start
++        public ChunkCoordComparator(int x, int z) {
++            this.x = x;
++            this.z = z;
++        }
++        // KigPaper end
++
+         public int compare(ChunkCoordIntPair a, ChunkCoordIntPair b) {
+             if (a.equals(b)) {
+                 return 0;
+-- 
+2.48.1
+

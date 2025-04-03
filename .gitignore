@@ -1,7 +1,9 @@
 .gradle/
 build/
 
-src/
+# workspace
+api/
+server/
 
 # lsp
 .jdtls/

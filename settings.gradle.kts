@@ -5,3 +5,5 @@ plugins {
 
 rootProject.name = "margit"
 include("appender")
+include("api")
+include("server")
