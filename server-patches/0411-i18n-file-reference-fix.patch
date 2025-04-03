@@ -1,0 +1,21 @@
+From: Margit <auto@margit.com>
+Date: Thu, 3 Apr 2025 15:09:49 +0200
+Subject: [PATCH] i18n file reference fix
+
+
+diff --git a/src/main/java/net/minecraft/server/LocaleLanguage.java b/src/main/java/net/minecraft/server/LocaleLanguage.java
+index c3513d0..8cac3b3 100644
+--- a/src/main/java/net/minecraft/server/LocaleLanguage.java
++++ b/src/main/java/net/minecraft/server/LocaleLanguage.java
+@@ -22,7 +22,7 @@ public class LocaleLanguage {
+ 
+     public LocaleLanguage() {
+         try {
+-            InputStream inputstream = LocaleLanguage.class.getResourceAsStream("/assets/minecraft/lang/en_US.lang");
++            InputStream inputstream = LocaleLanguage.class.getResourceAsStream("/mojang-translations/en_US.properties"); // Margit
+             Iterator iterator = IOUtils.readLines(inputstream, Charsets.UTF_8).iterator();
+ 
+             while (iterator.hasNext()) {
+-- 
+2.48.1
+
