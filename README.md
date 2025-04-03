@@ -6,11 +6,9 @@ A Minecraft 1.8.8 server modding toolchain
 
 Margit is a set of tools and patches that modify the official Minecraft 1.8.8 server jar. Notable changes include:
 
+- implement Bukkit API
 - use latest dependencies
-- use JDK 22
-- use lightweight green threads
-- console tab completer
-- remove Mojang snooper
+- use JDK 23
 
 ## Usage
 
@@ -22,6 +20,4 @@ cd Margit
 nix develop
 ```
 
-You should now have a deobfuscated, decompiled and patched `src` directory, cd into it and write some code!
-
-You might notice that `src` is a local Git repository. That's because we use its commit history to generate [patches](./patches). If you want to generate a patch, you simply need to write some code, commit it to `src`, and use the special `margit-build-patches` command from the root of this repository.
+You should now have deobfuscated, decompiled and patched `api` and `server` codebases. You may now make changes, commit them, and rebuild patches using the `margit-build-patches` command.
