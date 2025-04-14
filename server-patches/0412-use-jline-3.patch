@@ -1,0 +1,364 @@
+From: Margit <auto@margit.com>
+Date: Mon, 14 Apr 2025 09:43:56 +0200
+Subject: [PATCH] use jline 3
+
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 5c1b207..7554420 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -17,7 +17,7 @@ dependencies {
+     implementation("commons-io:commons-io:2.18.0")
+     implementation("net.sf.jopt-simple:jopt-simple:5.0.4")
+     implementation("org.fusesource.jansi:jansi:2.4.1")
+-    implementation("jline:jline:2.14.6")
++    implementation("org.jline:jline:3.29.0")
+     implementation("org.apache.logging.log4j:log4j-api:2.24.3")
+     implementation("org.apache.logging.log4j:log4j-core:2.24.3")
+ 
+diff --git a/src/main/java/net/minecraft/server/DedicatedServer.java b/src/main/java/net/minecraft/server/DedicatedServer.java
+index a6232d7..23b160a 100644
+--- a/src/main/java/net/minecraft/server/DedicatedServer.java
++++ b/src/main/java/net/minecraft/server/DedicatedServer.java
+@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Level;
+ import org.bukkit.craftbukkit.LoggerOutputStream;
+ import co.aikar.timings.SpigotTimings; // Spigot
+ import org.bukkit.event.server.ServerCommandEvent;
++import org.jline.reader.LineReader; // Margit
+ import org.bukkit.craftbukkit.util.Waitable;
+ import org.bukkit.event.server.RemoteServerCommandEvent;
+ // CraftBukkit end
+@@ -72,7 +73,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
+                 }
+                 // CraftBukkit end
+ 
+-                jline.console.ConsoleReader bufferedreader = reader; // CraftBukkit
++                LineReader bufferedreader = reader; // CraftBukkit // Margit
+                 String s;
+ 
+                 try {
+@@ -88,7 +89,7 @@ public class DedicatedServer extends MinecraftServer implements IMinecraftServer
+                         }
+                         // CraftBukkit end
+                     }
+-                } catch (IOException ioexception) {
++                } catch (/* Margit IOException */ Throwable ioexception) {
+                     DedicatedServer.LOGGER.error("Exception handling console input", ioexception);
+                 }
+ 
+diff --git a/src/main/java/net/minecraft/server/MinecraftServer.java b/src/main/java/net/minecraft/server/MinecraftServer.java
+index 9db37af..7b10aa6 100644
+--- a/src/main/java/net/minecraft/server/MinecraftServer.java
++++ b/src/main/java/net/minecraft/server/MinecraftServer.java
+@@ -41,7 +41,13 @@ import org.apache.logging.log4j.Logger;
+ // CraftBukkit start
+ import java.io.IOException;
+ 
+-import jline.console.ConsoleReader;
++// Margit start
++// import jline.console.ConsoleReader;
++import org.jline.reader.LineReader;
++import org.jline.reader.LineReaderBuilder;
++import org.jline.terminal.Terminal;
++import org.jline.terminal.TerminalBuilder;
++// Margit end
+ import joptsimple.OptionSet;
+ 
+ import org.bukkit.craftbukkit.Main;
+@@ -110,7 +116,11 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+     public OptionSet options;
+     public org.bukkit.command.ConsoleCommandSender console;
+     public org.bukkit.command.RemoteConsoleCommandSender remoteConsole;
+-    public ConsoleReader reader;
++    // Margit start
++    // public ConsoleReader reader;
++    public LineReader reader;
++    public Terminal terminal;
++    // Margit end
+     public static int currentTick = 0; // PaperSpigot - Further improve tick loop
+     public final Thread primaryThread;
+     public java.util.Queue<Runnable> processQueue = new java.util.concurrent.ConcurrentLinkedQueue<Runnable>();
+@@ -138,9 +148,22 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+         }
+ 
+         try {
++            // Margit start
++            /*
+             reader = new ConsoleReader(System.in, System.out);
+             reader.setExpandEvents(false); // Avoid parsing exceptions for uncommonly used event designators
++            */
++            terminal = TerminalBuilder.builder()
++                .system(true)
++                .build();
++            reader = LineReaderBuilder.builder()
++                .terminal(terminal)
++                .completer(new org.bukkit.craftbukkit.command.ConsoleCommandCompleter(this))
++                .build();
++            // Margit end
+         } catch (Throwable e) {
++            // Margit start
++            /*
+             try {
+                 // Try again with jline disabled for Windows users without C++ 2008 Redistributable
+                 System.setProperty("jline.terminal", "jline.UnsupportedTerminal");
+@@ -151,6 +174,9 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+             } catch (IOException ex) {
+                 LOGGER.warn((String) null, ex);
+             }
++            */
++            e.printStackTrace();
++            // Margit end
+         }
+         Runtime.getRuntime().addShutdownHook(new org.bukkit.craftbukkit.util.ServerShutdownThread(this));
+ 
+@@ -658,7 +684,7 @@ public abstract class MinecraftServer implements Runnable, ICommandListener, IAs
+             } finally {
+                 // CraftBukkit start - Restore terminal to original settings
+                 try {
+-                    reader.getTerminal().restore();
++                    reader.getTerminal().close(); // Margit
+                 } catch (Exception ignored) {
+                 }
+                 // CraftBukkit end
+diff --git a/src/main/java/net/minecraft/server/PlayerList.java b/src/main/java/net/minecraft/server/PlayerList.java
+index fb35d62..5549349 100644
+--- a/src/main/java/net/minecraft/server/PlayerList.java
++++ b/src/main/java/net/minecraft/server/PlayerList.java
+@@ -73,7 +73,7 @@ public abstract class PlayerList {
+     public PlayerList(MinecraftServer minecraftserver) {
+         this.cserver = minecraftserver.server = new CraftServer(minecraftserver, this);
+         minecraftserver.console = org.bukkit.craftbukkit.command.ColouredConsoleSender.getInstance();
+-        minecraftserver.reader.addCompleter(new org.bukkit.craftbukkit.command.ConsoleCommandCompleter(minecraftserver.server));
++        // minecraftserver.reader.addCompleter(new org.bukkit.craftbukkit.command.ConsoleCommandCompleter(minecraftserver.server)); // Margit
+         // CraftBukkit end
+         
+         this.k = new GameProfileBanList(PlayerList.a);
+diff --git a/src/main/java/org/bukkit/craftbukkit/CraftServer.java b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+index 42fc0d1..c06ca0b 100644
+--- a/src/main/java/org/bukkit/craftbukkit/CraftServer.java
++++ b/src/main/java/org/bukkit/craftbukkit/CraftServer.java
+@@ -27,7 +27,10 @@ import io.netty.buffer.ByteBuf;
+ import io.netty.buffer.ByteBufOutputStream;
+ import io.netty.buffer.Unpooled;
+ import io.netty.handler.codec.base64.Base64;
+-import jline.console.ConsoleReader;
++// Margit start
++// import jline.console.ConsoleReader;
++import org.jline.reader.LineReader;
++// Margit end
+ import net.md_5.bungee.api.chat.BaseComponent;
+ import net.minecraft.server.WorldType;
+ import net.minecraft.server.*;
+@@ -1079,7 +1082,7 @@ public final class CraftServer implements Server {
+         return logger;
+     }
+ 
+-    public ConsoleReader getReader() {
++    public LineReader getReader() { // Margit
+         return console.reader;
+     }
+ 
+diff --git a/src/main/java/org/bukkit/craftbukkit/Main.java b/src/main/java/org/bukkit/craftbukkit/Main.java
+index 4c06bd3..7182865 100644
+--- a/src/main/java/org/bukkit/craftbukkit/Main.java
++++ b/src/main/java/org/bukkit/craftbukkit/Main.java
+@@ -178,7 +178,7 @@ public class Main {
+                     AnsiConsole.systemInstall();
+                 } else {
+                     // This ensures the terminal literal will always match the jline implementation
+-                    System.setProperty(jline.TerminalFactory.JLINE_TERMINAL, jline.UnsupportedTerminal.class.getName());
++                    // System.setProperty(jline.TerminalFactory.JLINE_TERMINAL, jline.UnsupportedTerminal.class.getName()); Margit
+                 }
+ 
+ 
+diff --git a/src/main/java/org/bukkit/craftbukkit/command/ColouredConsoleSender.java b/src/main/java/org/bukkit/craftbukkit/command/ColouredConsoleSender.java
+index 26a2fb8..ca7a685 100644
+--- a/src/main/java/org/bukkit/craftbukkit/command/ColouredConsoleSender.java
++++ b/src/main/java/org/bukkit/craftbukkit/command/ColouredConsoleSender.java
+@@ -5,7 +5,10 @@ import java.util.Map;
+ 
+ import org.fusesource.jansi.Ansi;
+ import org.fusesource.jansi.Ansi.Attribute;
+-import jline.Terminal;
++// Margit start
++// import jline.Terminal;
++import org.jline.terminal.Terminal;
++// Margit end
+ 
+ import org.bukkit.Bukkit;
+ import org.bukkit.ChatColor;
+@@ -47,7 +50,7 @@ public class ColouredConsoleSender extends CraftConsoleCommandSender {
+ 
+     @Override
+     public void sendMessage(String message) {
+-        if (terminal.isAnsiSupported()) {
++        // if (terminal.isAnsiSupported()) { // Margit
+             if (!conversationTracker.isConversingModaly()) {
+                 String result = message;
+                 for (ChatColor color : colors) {
+@@ -59,9 +62,9 @@ public class ColouredConsoleSender extends CraftConsoleCommandSender {
+                 }
+                 System.out.println(result + Ansi.ansi().reset().toString());
+             }
+-        } else {
++        // } else { // Margit
+             super.sendMessage(message);
+-        }
++        // } // Margit
+     }
+ 
+     public static ConsoleCommandSender getInstance() {
+diff --git a/src/main/java/org/bukkit/craftbukkit/command/ConsoleCommandCompleter.java b/src/main/java/org/bukkit/craftbukkit/command/ConsoleCommandCompleter.java
+index 7ef5772..a4bdbfc 100644
+--- a/src/main/java/org/bukkit/craftbukkit/command/ConsoleCommandCompleter.java
++++ b/src/main/java/org/bukkit/craftbukkit/command/ConsoleCommandCompleter.java
+@@ -6,42 +6,58 @@ import java.util.logging.Level;
+ 
+ import org.bukkit.craftbukkit.CraftServer;
+ import org.bukkit.craftbukkit.util.Waitable;
+-
+-import jline.console.completer.Completer;
++import org.jline.reader.Candidate;
++// Margit start
++// import jline.console.completer.Completer;
++import org.jline.reader.Completer;
++import org.jline.reader.LineReader;
++import org.jline.reader.ParsedLine;
++import net.minecraft.server.MinecraftServer;
++// Margit end
+ 
+ public class ConsoleCommandCompleter implements Completer {
+-    private final CraftServer server;
++    // Margit start
++    // private final CraftServer server;
++    private final MinecraftServer server;
++    // Margit end
+ 
+-    public ConsoleCommandCompleter(CraftServer server) {
++    public ConsoleCommandCompleter(MinecraftServer server) {
+         this.server = server;
+     }
+ 
+-    public int complete(final String buffer, final int cursor, final List<CharSequence> candidates) {
++    public void complete(LineReader reader, ParsedLine parsedLine, final List<Candidate> candidates) { // Margit
+         Waitable<List<String>> waitable = new Waitable<List<String>>() {
+             @Override
+             protected List<String> evaluate() {
+-                return server.getCommandMap().tabComplete(server.getConsoleSender(), buffer);
++                return server.server.getCommandMap().tabComplete(server.server.getConsoleSender(), parsedLine.line()); // Margit
+             }
+         };
+-        this.server.getServer().processQueue.add(waitable);
++        this.server.server.getServer().processQueue.add(waitable); // Margit
+         try {
+             List<String> offers = waitable.get();
+             if (offers == null) {
+-                return cursor;
++                return; // Margit
++            }
++            // Margit start
++            // candidates.addAll(offers);
++            for (String offer : offers) {
++                candidates.add(new Candidate(offer));
+             }
+-            candidates.addAll(offers);
+ 
+-            final int lastSpace = buffer.lastIndexOf(' ');
++            /*
++            final int lastSpace = parsedLine.line().lastIndexOf(' ');
+             if (lastSpace == -1) {
+                 return cursor - buffer.length();
+             } else {
+                 return cursor - (buffer.length() - lastSpace - 1);
+             }
++            */
++            // Margit end
+         } catch (ExecutionException e) {
+-            this.server.getLogger().log(Level.WARNING, "Unhandled exception when tab completing", e);
++            this.server.server.getLogger().log(Level.WARNING, "Unhandled exception when tab completing", e); // Margit
+         } catch (InterruptedException e) {
+             Thread.currentThread().interrupt();
+         }
+-        return cursor;
++        return; // Margit
+     }
+ }
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/ServerShutdownThread.java b/src/main/java/org/bukkit/craftbukkit/util/ServerShutdownThread.java
+index ae3481b..d65199e 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/ServerShutdownThread.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/ServerShutdownThread.java
+@@ -18,7 +18,7 @@ public class ServerShutdownThread extends Thread {
+             ex.printStackTrace();
+         } finally {
+             try {
+-                server.reader.getTerminal().restore();
++                server.reader.getTerminal().close(); // Margit
+             } catch (Exception e) {
+             }
+         }
+diff --git a/src/main/java/org/bukkit/craftbukkit/util/TerminalConsoleWriterThread.java b/src/main/java/org/bukkit/craftbukkit/util/TerminalConsoleWriterThread.java
+index 772f730..6fa3c8b 100644
+--- a/src/main/java/org/bukkit/craftbukkit/util/TerminalConsoleWriterThread.java
++++ b/src/main/java/org/bukkit/craftbukkit/util/TerminalConsoleWriterThread.java
+@@ -4,15 +4,23 @@ import java.io.IOException;
+ import java.io.OutputStream;
+ import java.util.logging.Level;
+ import java.util.logging.Logger;
+-import jline.console.ConsoleReader;
++// Margit start
++// import jline.console.ConsoleReader;
++import org.jline.reader.LineReader;
++// Margit end
+ import com.mojang.util.QueueLogAppender;
+ import org.bukkit.craftbukkit.Main;
+ 
+ public class TerminalConsoleWriterThread implements Runnable {
++    // Margit start
++    /*
+     final private ConsoleReader reader;
++    */
++    final private LineReader reader;
++    // Margit end
+     final private OutputStream output;
+ 
+-    public TerminalConsoleWriterThread(OutputStream output, ConsoleReader reader) {
++    public TerminalConsoleWriterThread(OutputStream output, /* Margit ConsoleReader */ LineReader reader) {
+         this.output = output;
+         this.reader = reader;
+     }
+@@ -29,17 +37,29 @@ public class TerminalConsoleWriterThread implements Runnable {
+ 
+             try {
+                 if (Main.useJline) {
++                    // Margit start
++                    /*
+                     reader.print(ConsoleReader.RESET_LINE + "");
+                     reader.flush();
++                    */
++
++                    reader.callWidget(LineReader.CLEAR);
++                    reader.getTerminal().writer().flush();
++
+                     output.write(message.getBytes());
+                     output.flush();
+ 
+                     try {
+-                        reader.drawLine();
++                        // reader.drawLine();
++                        reader.callWidget(LineReader.REDRAW_LINE);
++                        reader.callWidget(LineReader.REDISPLAY);
+                     } catch (Throwable ex) {
+-                        reader.getCursorBuffer().clear();
++                        // reader.getCursorBuffer().clear();
++                        reader.getBuffer().clear();
+                     }
+-                    reader.flush();
++                    // reader.flush();
++                    reader.getTerminal().writer().flush();
++                    // Margit end
+                 } else {
+                     output.write(message.getBytes());
+                     output.flush();
+-- 
+2.48.1
+
