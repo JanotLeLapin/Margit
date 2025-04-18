@@ -2,7 +2,6 @@
 , busybox
 , gnupatch
 , margit-decompiled-src
-, margit-bukkit
 , margit-craft-bukkit
 , stdenv
 }: stdenv.mkDerivation {
@@ -10,16 +9,6 @@
   src = ./.;
   buildInputs = [ git busybox gnupatch ];
   buildPhase = ''
-    cp -r --no-preserve=all ${margit-bukkit} api
-    cd api
-    git init
-    git config user.email "auto@margit.com"
-    git config user.name "Margit"
-    git add .
-    git commit -m "initial commit"
-    git am --3way --ignore-whitespace ${./api-patches}/*.patch
-    cd ..
-
     mkdir nms
     cp -r --no-preserve=all ${margit-decompiled-src}/main nms
 
@@ -47,7 +36,6 @@
   installPhase = ''
     mkdir $out
 
-    mv api $out
     mv server $out
   '';
 }

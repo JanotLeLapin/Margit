@@ -31,12 +31,6 @@
     hash = "sha256-Oa73INxTCUdvVvLpalFvPdMEG7v0Qsv9R9Y6y9Bq8x4=";
   };
 
-  margit-bukkit = fetchgit {
-    url = "https://hub.spigotmc.org/stash/scm/spigot/bukkit.git";
-    rev = "01d1820664a5f881665b84b28871dadd132deaef";
-    hash = "sha256-Fe8k/P6uohIGHzFaxatgmXqyWQnTd63MlcEtvGZXdOM=";
-  };
-
   margit-craft-bukkit = fetchgit {
     url = "https://hub.spigotmc.org/stash/scm/spigot/craftbukkit.git";
     rev = "e1ebe524a78e27f6a2829ed4574fded3779094e1";
@@ -47,7 +41,7 @@
 
   margit-mapped-jar = callPackage ./remap.nix { inherit margit-original-jar margit-build-data; };
   margit-decompiled-src = callPackage ./decompile.nix { inherit margit-mapped-jar margit-build-data; };
-  margit-patched-src = callPackage ./apply-patches.nix { inherit margit-decompiled-src margit-bukkit margit-craft-bukkit; };
+  margit-patched-src = callPackage ./apply-patches.nix { inherit margit-decompiled-src margit-craft-bukkit; };
 
   margit-build-patches = callPackage ./build-patches.nix {};
 in mkShell {
@@ -57,13 +51,6 @@ in mkShell {
   ];
 
   shellHook = ''
-    if [ ! -d "api" ]; then
-      cp -r --no-preserve=all ${margit-patched-src}/api .
-      echo "Initialized api"
-    else
-      echo "Skipping api initialization"
-    fi
-
     if [ ! -d "server" ]; then
       cp -r --no-preserve=all ${margit-patched-src}/server .
       echo "Initialized server"
