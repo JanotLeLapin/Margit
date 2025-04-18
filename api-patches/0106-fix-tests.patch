@@ -1,0 +1,182 @@
+From: Margit <auto@margit.com>
+Date: Mon, 14 Apr 2025 11:29:10 +0200
+Subject: [PATCH] fix tests
+
+
+diff --git a/build.gradle.kts b/build.gradle.kts
+index 47d86f9..927805e 100644
+--- a/build.gradle.kts
++++ b/build.gradle.kts
+@@ -21,6 +21,9 @@ dependencies {
+     api("net.sf.trove4j:core:3.1.0")
+ 
+     api("net.md-5:bungeecord-chat:1.8-SNAPSHOT")
++
++    testImplementation("junit:junit:4.13")
++    testImplementation("org.hamcrest:hamcrest:3.0")
+ }
+ 
+ java {
+@@ -29,12 +32,6 @@ java {
+     }
+ }
+ 
+-tasks {
+-    test {
+-        useJUnitPlatform()
+-    }
+-}
+-
+ tasks.withType<JavaCompile> {
+     // options.compilerArgs.add("-Xlint:deprecation")
+     options.compilerArgs.add("-nowarn")
+diff --git a/src/test/java/org/bukkit/ArtTest.java b/src/test/java/org/bukkit/ArtTest.java
+index 29fe34a..8430df2 100644
+--- a/src/test/java/org/bukkit/ArtTest.java
++++ b/src/test/java/org/bukkit/ArtTest.java
+@@ -8,7 +8,7 @@ import org.junit.Test;
+ 
+ public class ArtTest {
+ 
+-    @Test(expected = IllegalArgumentException.class)
++    @Test(expected = NullPointerException.class) // Margit
+     public void getByNullName() {
+         Art.getByName(null);
+     }
+diff --git a/src/test/java/org/bukkit/ChatColorTest.java b/src/test/java/org/bukkit/ChatColorTest.java
+index 80108a5..9f472f3 100644
+--- a/src/test/java/org/bukkit/ChatColorTest.java
++++ b/src/test/java/org/bukkit/ChatColorTest.java
+@@ -15,7 +15,7 @@ public class ChatColorTest {
+         }
+     }
+ 
+-    @Test(expected = IllegalArgumentException.class)
++    @Test(expected = NullPointerException.class) // Margit
+     public void getByStringWithNull() {
+         ChatColor.getByChar((String) null);
+     }
+diff --git a/src/test/java/org/bukkit/MaterialTest.java b/src/test/java/org/bukkit/MaterialTest.java
+index cbca840..06a4030 100644
+--- a/src/test/java/org/bukkit/MaterialTest.java
++++ b/src/test/java/org/bukkit/MaterialTest.java
+@@ -53,7 +53,7 @@ public class MaterialTest {
+         }
+     }
+ 
+-    @Test(expected = IllegalArgumentException.class)
++    @Test(expected = NullPointerException.class) // Margit
+     public void matchMaterialByNull() {
+         Material.matchMaterial(null);
+     }
+diff --git a/src/test/java/org/bukkit/potion/PotionTest.java b/src/test/java/org/bukkit/potion/PotionTest.java
+index 9ea901d..b3bbc4b 100644
+--- a/src/test/java/org/bukkit/potion/PotionTest.java
++++ b/src/test/java/org/bukkit/potion/PotionTest.java
+@@ -107,7 +107,7 @@ public class PotionTest {
+         assertTrue((potion.toDamageValue() & 0x3F) == (PotionType.POISON.getDamageValue() | 0x20));
+     }
+ 
+-    @Test(expected=IllegalArgumentException.class)
++    @Test(expected=NullPointerException.class) // Margit
+     public void nullType() {
+         new Potion(null, 2);
+     }
+@@ -123,13 +123,13 @@ public class PotionTest {
+         potion.setLevel(3);
+     }
+ 
+-    @Test(expected=IllegalArgumentException.class)
++    @Test(expected=NullPointerException.class) // Margit
+     public void nullStack() {
+         Potion potion = new Potion(PotionType.POISON);
+         potion.apply((ItemStack) null);
+     }
+ 
+-    @Test(expected=IllegalArgumentException.class)
++    @Test(expected=NullPointerException.class) // Margit
+     public void nullEntity() {
+         Potion potion = new Potion(PotionType.POISON);
+         potion.apply((LivingEntity) null);
+diff --git a/src/test/java/org/bukkit/util/StringUtilTest.java b/src/test/java/org/bukkit/util/StringUtilTest.java
+index 9c8444c..17fc83d 100644
+--- a/src/test/java/org/bukkit/util/StringUtilTest.java
++++ b/src/test/java/org/bukkit/util/StringUtilTest.java
+@@ -18,22 +18,22 @@ public class StringUtilTest {
+         StringUtil.startsWithIgnoreCase("String", null);
+     }
+ 
+-    @Test(expected=IllegalArgumentException.class)
++    @Test(expected=NullPointerException.class) // Margit
+     public void nullStringTest() {
+         StringUtil.startsWithIgnoreCase(null, "String");
+     }
+ 
+-    @Test(expected=IllegalArgumentException.class)
++    @Test(expected=NullPointerException.class) // Margit
+     public void nullCollectionTest() {
+         StringUtil.copyPartialMatches("Token", ImmutableList.<String>of(), null);
+     }
+ 
+-    @Test(expected=IllegalArgumentException.class)
++    @Test(expected=NullPointerException.class) // Margit
+     public void nullIterableTest() {
+         StringUtil.copyPartialMatches("Token", null, new ArrayList<String>());
+     }
+ 
+-    @Test(expected=IllegalArgumentException.class)
++    @Test(expected=NullPointerException.class) // Margit
+     public void nullTokenTest() {
+         StringUtil.copyPartialMatches(null, ImmutableList.<String>of(), new ArrayList<String>());
+     }
+@@ -54,7 +54,7 @@ public class StringUtilTest {
+         StringUtil.copyPartialMatches("token", ImmutableList.of("token1", "token2"), ImmutableList.of());
+     }
+ 
+-    @Test(expected=IllegalArgumentException.class)
++    @Test(expected=NullPointerException.class) // Margit
+     public void copyNullTest() {
+         StringUtil.copyPartialMatches("token", Arrays.asList("token1", "token2", null), new ArrayList<String>());
+     }
+diff --git a/src/test/java/org/bukkit/util/io/BukkitObjectStreamTest.java b/src/test/java/org/bukkit/util/io/BukkitObjectStreamTest.java
+index d0af4a0..55454d0 100644
+--- a/src/test/java/org/bukkit/util/io/BukkitObjectStreamTest.java
++++ b/src/test/java/org/bukkit/util/io/BukkitObjectStreamTest.java
+@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream;
+ import java.io.IOException;
+ import java.io.ObjectInputStream;
+ import java.io.ObjectOutputStream;
++import java.util.Base64; // Margit
+ import java.util.List;
+ 
+ import org.bukkit.Color;
+@@ -21,7 +22,7 @@ import org.junit.runner.RunWith;
+ import org.junit.runners.Parameterized;
+ import org.junit.runners.Parameterized.Parameter;
+ import org.junit.runners.Parameterized.Parameters;
+-import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
++// import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder; // Margit
+ 
+ import com.google.common.collect.ImmutableList;
+ 
+@@ -102,7 +103,7 @@ public class BukkitObjectStreamTest {
+             }
+         }
+ 
+-        final byte[] preEncodedArray = Base64Coder.decode(preEncoded);
++        final byte[] preEncodedArray = Base64.getDecoder().decode(preEncoded); // Margit
+ 
+         final Object readBack;
+         final Object preEncoded;
+@@ -162,7 +163,7 @@ public class BukkitObjectStreamTest {
+             }
+         }
+ 
+-        final String string = new String(Base64Coder.encode(out.toByteArray()));
++        final String string = new String(Base64.getEncoder().encode(out.toByteArray()));
+         try {
+             assertThat(preEncoded, is(string));
+         } catch (Throwable t) {
+-- 
+2.48.1
+
