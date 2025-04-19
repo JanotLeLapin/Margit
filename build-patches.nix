@@ -1,17 +1,15 @@
-{ writeScriptBin }: writeScriptBin "margit-build-patches" ''
+{ writeScriptBin
+, margit-decompiled-src
+}: writeScriptBin "margit-build-patches" ''
   #!/bin/sh
-
-  rm -r api-patches
-  mkdir api-patches
-  git -C api format-patch --no-stat -N -o "$(pwd)/api-patches" $(git -C api rev-list --max-parents=0 HEAD)..HEAD
-  for patch in "$(pwd)/api-patches"/*.patch; do
-    sed -i "1d" $patch
-  done
-
-  rm -r server-patches
-  mkdir server-patches
-  git -C server format-patch --no-stat -N -o "$(pwd)/server-patches" $(git -C server rev-list --max-parents=0 HEAD)..HEAD
-  for patch in "$(pwd)/server-patches"/*.patch; do
-    sed -i "1d" $patch
-  done
+  mkdir -p nms-patches
+  for file in ${margit-decompiled-src}/main/java/net/minecraft/server/*; do
+    filename=$(basename "$file")
+    file_b="server/src/main/java/net/minecraft/server/$filename"
+    if [ -f "$file_b" ]; then
+        if ! diff -q "$file" "$file_b" >/dev/null; then
+            diff -u --label="$filename" --label="$filename" "$file" "$file_b" > "nms-patches/$filename.patch"
+        fi
+    fi
+done
 ''

@@ -37,7 +37,7 @@
   margit-decompiled-src = callPackage ./decompile.nix { inherit margit-mapped-jar margit-build-data; };
   margit-patched-src = callPackage ./apply-patches.nix { inherit margit-decompiled-src; };
 
-  margit-build-patches = callPackage ./build-patches.nix {};
+  margit-build-patches = callPackage ./build-patches.nix { inherit margit-decompiled-src; };
 in mkShell {
   buildInputs = [
     jdk23 git gnutar
