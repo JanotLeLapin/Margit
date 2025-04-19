@@ -1,0 +1,12 @@
+--- PacketPlayInTransaction.java
++++ PacketPlayInTransaction.java
+@@ -34,7 +34,9 @@
+         return this.b;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayIn) packetlistener);
+     }
++    */
+ }

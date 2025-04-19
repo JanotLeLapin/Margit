@@ -1,0 +1,11 @@
+--- EnumProtocol.java
++++ EnumProtocol.java
+@@ -147,7 +147,7 @@
+     }
+ 
+     protected EnumProtocol a(EnumProtocolDirection enumprotocoldirection, Class<? extends Packet> oclass) {
+-        Object object = (BiMap) this.j.get(enumprotocoldirection);
++        BiMap object = this.j.get(enumprotocoldirection); // Margit
+ 
+         if (object == null) {
+             object = HashBiMap.create();

@@ -1,0 +1,12 @@
+--- PacketPlayOutOpenWindow.java
++++ PacketPlayOutOpenWindow.java
+@@ -54,7 +54,9 @@
+ 
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

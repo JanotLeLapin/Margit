@@ -1,0 +1,14 @@
+--- OpList.java
++++ OpList.java
+@@ -54,7 +54,9 @@
+         return (GameProfile) oplistentry.getKey();
+     }
+ 
+-    protected String a(Object object) {
+-        return this.c((GameProfile) object);
++    // Margit start
++    protected String a(GameProfile object) {
++        return this.c(object);
+     }
++    // Margit end
+ }

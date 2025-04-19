@@ -1,0 +1,15 @@
+--- WorldGenGroundBush.java
++++ WorldGenGroundBush.java
+@@ -46,7 +46,12 @@
+                     }
+                 }
+             }
++        // CraftBukkit start - Return false if gen was unsuccessful
++        } else {
++            return false;
+         }
++        // CraftBukkit end
++
+ 
+         return true;
+     }

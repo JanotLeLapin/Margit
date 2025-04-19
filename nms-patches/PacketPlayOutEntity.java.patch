@@ -1,0 +1,49 @@
+--- PacketPlayOutEntity.java
++++ PacketPlayOutEntity.java
+@@ -35,9 +35,11 @@
+         return "Entity_" + super.toString();
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ 
+     public static class PacketPlayOutEntityLook extends PacketPlayOutEntity {
+ 
+@@ -67,9 +69,11 @@
+             packetdataserializer.writeBoolean(this.g);
+         }
+ 
++    /* Margit
+         public void a(PacketListener packetlistener) {
+             super.a((PacketListenerPlayOut) packetlistener);
+         }
++    */
+     }
+ 
+     public static class PacketPlayOutRelEntityMove extends PacketPlayOutEntity {
+@@ -100,9 +104,11 @@
+             packetdataserializer.writeBoolean(this.g);
+         }
+ 
++    /* Margit
+         public void a(PacketListener packetlistener) {
+             super.a((PacketListenerPlayOut) packetlistener);
+         }
++    */
+     }
+ 
+     public static class PacketPlayOutRelEntityMoveLook extends PacketPlayOutEntity {
+@@ -142,8 +148,10 @@
+             packetdataserializer.writeBoolean(this.g);
+         }
+ 
++    /* Margit
+         public void a(PacketListener packetlistener) {
+             super.a((PacketListenerPlayOut) packetlistener);
+         }
++    */
+     }
+ }

@@ -1,0 +1,18 @@
+--- Achievement.java
++++ Achievement.java
+@@ -23,6 +23,7 @@
+         this.k = "achievement." + s1 + ".desc";
+         this.a = i;
+         this.b = j;
++        /* Margit
+         if (i < AchievementList.a) {
+             a = i;
+         }
+@@ -30,6 +31,7 @@
+         if (j < AchievementList.b) {
+             b = j;
+         }
++        */
+ 
+         if (i > AchievementList.c) {
+             AchievementList.c = i;

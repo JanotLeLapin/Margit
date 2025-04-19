@@ -1,0 +1,12 @@
+--- PacketPlayOutEntityEffect.java
++++ PacketPlayOutEntityEffect.java
+@@ -45,7 +45,9 @@
+         packetlistenerplayout.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

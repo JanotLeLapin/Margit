@@ -1,0 +1,12 @@
+--- PacketPlayOutRespawn.java
++++ PacketPlayOutRespawn.java
+@@ -40,7 +40,9 @@
+         packetdataserializer.a(this.d.name());
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

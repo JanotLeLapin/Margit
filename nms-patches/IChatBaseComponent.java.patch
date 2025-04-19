@@ -1,0 +1,21 @@
+--- IChatBaseComponent.java
++++ IChatBaseComponent.java
+@@ -220,13 +220,15 @@
+             return (IChatBaseComponent) IChatBaseComponent.ChatSerializer.a.fromJson(s, IChatBaseComponent.class);
+         }
+ 
+-        public JsonElement serialize(Object object, Type type, JsonSerializationContext jsonserializationcontext) {
+-            return this.a((IChatBaseComponent) object, type, jsonserializationcontext);
++        // Margit start
++        public JsonElement serialize(IChatBaseComponent object, Type type, JsonSerializationContext jsonserializationcontext) {
++            return this.a(object, type, jsonserializationcontext);
+         }
+ 
+-        public Object deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
++        public IChatBaseComponent deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
+             return this.a(jsonelement, type, jsondeserializationcontext);
+         }
++        // Margit end
+ 
+         static {
+             GsonBuilder gsonbuilder = new GsonBuilder();

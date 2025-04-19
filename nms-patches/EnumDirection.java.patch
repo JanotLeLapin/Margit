@@ -1,0 +1,29 @@
+--- EnumDirection.java
++++ EnumDirection.java
+@@ -275,9 +275,11 @@
+             return Iterators.forArray(this.a());
+         }
+ 
+-        public boolean apply(Object object) {
++        // Margit start
++        public boolean apply(EnumDirection object) {
+             return this.a((EnumDirection) object);
+         }
++        // Margit end
+     }
+ 
+     public static enum EnumAxisDirection {
+@@ -342,9 +344,11 @@
+             return this.e;
+         }
+ 
+-        public boolean apply(Object object) {
+-            return this.a((EnumDirection) object);
++        // Margit start
++        public boolean apply(EnumDirection object) {
++            return this.a(object);
+         }
++        // Margit end
+ 
+         static {
+             EnumDirection.EnumAxis[] aenumdirection_enumaxis = values();

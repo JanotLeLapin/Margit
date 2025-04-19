@@ -1,0 +1,14 @@
+--- PacketPlayOutScoreboardScore.java
++++ PacketPlayOutScoreboardScore.java
+@@ -56,9 +56,11 @@
+         packetlistenerplayout.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ 
+     public static enum EnumScoreboardAction {
+ 

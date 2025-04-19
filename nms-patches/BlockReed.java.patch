@@ -1,0 +1,22 @@
+--- BlockReed.java
++++ BlockReed.java
+@@ -25,12 +25,16 @@
+                     ;
+                 }
+ 
+-                if (i < 3) {
++                if (i < world.paperSpigotConfig.reedMaxHeight) { // PaperSpigot - Configurable max growth height for reed blocks) {
+                     int j = ((Integer) iblockdata.get(BlockReed.AGE)).intValue();
+ 
+-                    if (j == 15) {
+-                        world.setTypeUpdate(blockposition.up(), this.getBlockData());
++                    if (j >= (byte) range(3, (world.growthOdds / world.spigotConfig.caneModifier * 15) + 0.5F, 15)) { // Spigot
++                        // CraftBukkit start
++                        // world.setTypeUpdate(blockposition.up(), this.getBlockData()); // CraftBukkit
++                        BlockPosition upPos = blockposition.up();
++                        org.bukkit.craftbukkit.event.CraftEventFactory.handleBlockGrowEvent(world, upPos.getX(), upPos.getY(), upPos.getZ(), this, 0);
+                         world.setTypeAndData(blockposition, iblockdata.set(BlockReed.AGE, Integer.valueOf(0)), 4);
++                        // CraftBukkit end
+                     } else {
+                         world.setTypeAndData(blockposition, iblockdata.set(BlockReed.AGE, Integer.valueOf(j + 1)), 4);
+                     }

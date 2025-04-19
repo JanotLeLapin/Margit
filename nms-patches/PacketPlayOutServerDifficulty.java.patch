@@ -1,0 +1,12 @@
+--- PacketPlayOutServerDifficulty.java
++++ PacketPlayOutServerDifficulty.java
+@@ -26,7 +26,9 @@
+         packetdataserializer.writeByte(this.a.a());
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

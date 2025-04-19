@@ -1,0 +1,127 @@
+--- MobSpawnerAbstract.java
++++ MobSpawnerAbstract.java
+@@ -4,6 +4,12 @@
+ import java.util.Iterator;
+ import java.util.List;
+ 
++// CraftBukkit start
++import org.bukkit.craftbukkit.event.CraftEventFactory;
++import org.bukkit.event.entity.CreatureSpawnEvent;
++import org.bukkit.event.entity.SpawnerSpawnEvent;
++// CraftBukkit end
++
+ public abstract class MobSpawnerAbstract {
+ 
+     public int spawnDelay = 20;
+@@ -19,11 +25,17 @@
+     private int maxNearbyEntities = 6;
+     private int requiredPlayerRange = 16;
+     private int spawnRange = 4;
++    private int tickDelay = 0; // PaperSpigot
+ 
+     public MobSpawnerAbstract() {}
+ 
+     public String getMobName() {
+         if (this.i() == null) {
++            // CraftBukkit start - fix NPE
++            if (this.mobName == null) {
++                this.mobName = "Pig";
++            }
++            // CraftBukkit end
+             if (this.mobName != null && this.mobName.equals("Minecart")) {
+                 this.mobName = "MinecartRideable";
+             }
+@@ -41,10 +53,14 @@
+     private boolean g() {
+         BlockPosition blockposition = this.b();
+ 
+-        return this.a().isPlayerNearby((double) blockposition.getX() + 0.5D, (double) blockposition.getY() + 0.5D, (double) blockposition.getZ() + 0.5D, (double) this.requiredPlayerRange);
++        return this.a().isPlayerNearbyWhoAffectsSpawning((double) blockposition.getX() + 0.5D, (double) blockposition.getY() + 0.5D, (double) blockposition.getZ() + 0.5D, (double) this.requiredPlayerRange); // PaperSpigot - Affects Spawning API
+     }
+ 
+     public void c() {
++        // PaperSpigot start - Configurable mob spawner tick rate
++        if (spawnDelay > 0 && --tickDelay > 0) return;
++        tickDelay = this.a().paperSpigotConfig.mobSpawnerTickRate;
++        // PaperSpigot end
+         if (this.g()) {
+             BlockPosition blockposition = this.b();
+             double d0;
+@@ -57,18 +73,18 @@
+                 this.a().addParticle(EnumParticle.SMOKE_NORMAL, d1, d2, d0, 0.0D, 0.0D, 0.0D, new int[0]);
+                 this.a().addParticle(EnumParticle.FLAME, d1, d2, d0, 0.0D, 0.0D, 0.0D, new int[0]);
+                 if (this.spawnDelay > 0) {
+-                    --this.spawnDelay;
++                    this.spawnDelay -= tickDelay; // PaperSpigot
+                 }
+ 
+                 this.f = this.e;
+                 this.e = (this.e + (double) (1000.0F / ((float) this.spawnDelay + 200.0F))) % 360.0D;
+             } else {
+-                if (this.spawnDelay == -1) {
++                if (this.spawnDelay < -tickDelay) { // PaperSpigot
+                     this.h();
+                 }
+ 
+                 if (this.spawnDelay > 0) {
+-                    --this.spawnDelay;
++                    this.spawnDelay -= tickDelay; // PaperSpigot
+                     return;
+                 }
+ 
+@@ -129,7 +145,18 @@
+ 
+             entity.f(nbttagcompound);
+             if (entity.world != null && flag) {
+-                entity.world.addEntity(entity);
++                // CraftBukkit start - call SpawnerSpawnEvent, abort if cancelled
++                SpawnerSpawnEvent event = CraftEventFactory.callSpawnerSpawnEvent(entity, this.b().getX(), this.b().getY(), this.b().getZ());
++                if (!event.isCancelled()) {
++                    entity.world.addEntity(entity, CreatureSpawnEvent.SpawnReason.SPAWNER); // CraftBukkit
++                    // Spigot Start
++                    if ( entity.world.spigotConfig.nerfSpawnerMobs )
++                    {
++                        entity.fromMobSpawner = true;
++                    }
++                    // Spigot End
++                }
++                // CraftBukkit end
+             }
+ 
+             NBTTagCompound nbttagcompound1;
+@@ -153,8 +180,13 @@
+ 
+                     entity2.f(nbttagcompound2);
+                     entity2.setPositionRotation(entity1.locX, entity1.locY, entity1.locZ, entity1.yaw, entity1.pitch);
++                    // CraftBukkit start - call SpawnerSpawnEvent, skip if cancelled
++                    SpawnerSpawnEvent event = CraftEventFactory.callSpawnerSpawnEvent(entity2, this.b().getX(), this.b().getY(), this.b().getZ());
++                    if (event.isCancelled()) {
++                        continue;
++                    }
+                     if (entity.world != null && flag) {
+-                        entity.world.addEntity(entity2);
++                        entity.world.addEntity(entity2, CreatureSpawnEvent.SpawnReason.SPAWNER); // CraftBukkit
+                     }
+ 
+                     entity1.mount(entity2);
+@@ -166,8 +198,18 @@
+             if (entity instanceof EntityInsentient) {
+                 ((EntityInsentient) entity).prepare(entity.world.E(new BlockPosition(entity)), (GroupDataEntity) null);
+             }
+-
+-            entity.world.addEntity(entity);
++            // Spigot start - call SpawnerSpawnEvent, abort if cancelled
++            SpawnerSpawnEvent event = CraftEventFactory.callSpawnerSpawnEvent(entity, this.b().getX(), this.b().getY(), this.b().getZ());
++            if (!event.isCancelled()) {
++                entity.world.addEntity(entity, CreatureSpawnEvent.SpawnReason.SPAWNER); // CraftBukkit
++                // Spigot Start
++                if ( entity.world.spigotConfig.nerfSpawnerMobs )
++                {
++                    entity.fromMobSpawner = true;
++                }
++                // Spigot End
++            }
++            // Spigot end
+         }
+ 
+         return entity;

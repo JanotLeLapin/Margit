@@ -1,0 +1,18 @@
+--- RegistryBlocks.java
++++ RegistryBlocks.java
+@@ -24,13 +24,13 @@
+     }
+ 
+     public V get(K k0) {
+-        Object object = super.get(k0);
++        V object = super.get(k0); // Margit
+ 
+         return object == null ? this.e : object;
+     }
+ 
+     public V a(int i) {
+-        Object object = super.a(i);
++        V object = super.a(i); // Margit
+ 
+         return object == null ? this.e : object;
+     }

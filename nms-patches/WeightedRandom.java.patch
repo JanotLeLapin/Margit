@@ -1,0 +1,11 @@
+--- WeightedRandom.java
++++ WeightedRandom.java
+@@ -42,7 +42,7 @@
+             i -= weightedrandom_weightedrandomchoice.a;
+         } while (i >= 0);
+ 
+-        return weightedrandom_weightedrandomchoice;
++        return (T) weightedrandom_weightedrandomchoice; // Margit
+     }
+ 
+     public static <T extends WeightedRandom.WeightedRandomChoice> T a(Random random, Collection<T> collection) {

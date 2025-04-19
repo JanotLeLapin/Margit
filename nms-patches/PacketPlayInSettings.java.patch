@@ -1,0 +1,12 @@
+--- PacketPlayInSettings.java
++++ PacketPlayInSettings.java
+@@ -48,7 +48,9 @@
+         return this.e;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayIn) packetlistener);
+     }
++    */
+ }

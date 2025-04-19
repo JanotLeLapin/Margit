@@ -1,0 +1,14 @@
+--- NextTickListEntry.java
++++ NextTickListEntry.java
+@@ -50,7 +50,9 @@
+         return this.e;
+     }
+ 
+-    public int compareTo(Object object) {
+-        return this.a((NextTickListEntry) object);
++    // Margit start
++    public int compareTo(NextTickListEntry object) {
++        return this.a(object);
+     }
++    // Margit end
+ }

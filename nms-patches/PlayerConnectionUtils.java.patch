@@ -1,0 +1,11 @@
+--- PlayerConnectionUtils.java
++++ PlayerConnectionUtils.java
+@@ -6,7 +6,7 @@
+         if (!iasynctaskhandler.isMainThread()) {
+             iasynctaskhandler.postToMainThread(new Runnable() {
+                 public void run() {
+-                    packet.a(packetlistener);
++                    packet.a(t0); // Margit
+                 }
+             });
+             throw CancelledPacketHandleException.INSTANCE;

@@ -1,0 +1,21 @@
+--- CustomWorldSettingsFinal.java
++++ CustomWorldSettingsFinal.java
+@@ -365,13 +365,15 @@
+             return jsonobject;
+         }
+ 
+-        public Object deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
++        // Margit start
++        public CustomWorldSettings deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
+             return this.a(jsonelement, type, jsondeserializationcontext);
+         }
+ 
+-        public JsonElement serialize(Object object, Type type, JsonSerializationContext jsonserializationcontext) {
+-            return this.a((CustomWorldSettingsFinal.CustomWorldSettings) object, type, jsonserializationcontext);
++        public JsonElement serialize(CustomWorldSettings object, Type type, JsonSerializationContext jsonserializationcontext) {
++            return this.a(object, type, jsonserializationcontext);
+         }
++        // Margit end
+     }
+ 
+     public static class CustomWorldSettings {

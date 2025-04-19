@@ -1,0 +1,260 @@
+--- NetworkManager.java
++++ NetworkManager.java
+@@ -2,11 +2,7 @@
+ 
+ import com.google.common.collect.Queues;
+ import com.google.common.util.concurrent.ThreadFactoryBuilder;
+-import io.netty.channel.Channel;
+-import io.netty.channel.ChannelFuture;
+-import io.netty.channel.ChannelFutureListener;
+-import io.netty.channel.ChannelHandlerContext;
+-import io.netty.channel.SimpleChannelInboundHandler;
++import io.netty.channel.*;
+ import io.netty.channel.epoll.EpollEventLoopGroup;
+ import io.netty.channel.local.LocalChannel;
+ import io.netty.channel.local.LocalEventLoopGroup;
+@@ -14,10 +10,13 @@
+ import io.netty.channel.nio.NioEventLoopGroup;
+ import io.netty.handler.timeout.TimeoutException;
+ import io.netty.util.AttributeKey;
++import io.netty.util.concurrent.AbstractEventExecutor;
+ import io.netty.util.concurrent.Future;
+ import io.netty.util.concurrent.GenericFutureListener;
+ import java.net.SocketAddress;
++import java.util.Iterator;
+ import java.util.Queue;
++import java.util.concurrent.atomic.AtomicInteger;
+ import java.util.concurrent.locks.ReentrantReadWriteLock;
+ import javax.crypto.SecretKey;
+ import org.apache.commons.lang3.ArrayUtils;
+@@ -26,9 +25,9 @@
+ import org.apache.logging.log4j.Logger;
+ import org.apache.logging.log4j.Marker;
+ import org.apache.logging.log4j.MarkerManager;
++import org.github.paperspigot.PaperSpigotConfig;
+ 
+ public class NetworkManager extends SimpleChannelInboundHandler<Packet> {
+-
+     private static final Logger g = LogManager.getLogger();
+     public static final Marker a = MarkerManager.getMarker("NETWORK");
+     public static final Marker b = MarkerManager.getMarker("NETWORK_PACKETS", NetworkManager.a);
+@@ -64,12 +63,45 @@
+     private final Queue<NetworkManager.QueuedPacket> i = Queues.newConcurrentLinkedQueue();
+     private final ReentrantReadWriteLock j = new ReentrantReadWriteLock();
+     public Channel channel;
+-    private SocketAddress l;
++    // Spigot Start // PAIL
++    public SocketAddress l;
++    public java.util.UUID spoofedUUID;
++    public com.mojang.authlib.properties.Property[] spoofedProfile;
++    public boolean preparing = true;
++    // Spigot End
+     private PacketListener m;
+     private IChatBaseComponent n;
+     private boolean o;
+     private boolean p;
+ 
++    // KigPaper start - Tuinity-0017
++    private volatile boolean canFlush = true;
++    private final AtomicInteger packetWrites = new AtomicInteger();
++    private int flushPacketsStart;
++    private final Object flushLock = new Object();
++
++    public void disableAutomaticFlush() {
++        synchronized (this.flushLock) {
++            this.flushPacketsStart = this.packetWrites.get();
++            this.canFlush = false;
++        }
++    }
++
++    public void enableAutomaticFlush() {
++        synchronized (this.flushLock) {
++            this.canFlush = true;
++            if (this.packetWrites.get() != this.flushPacketsStart) {
++                this.flush();
++            }
++        }
++    }
++
++    private void flush() {
++        if(this.channel.eventLoop().inEventLoop()) this.channel.flush();
++        else this.channel.eventLoop().execute(() -> this.channel.flush());
++    }
++    // KigPaper end
++
+     public NetworkManager(EnumProtocolDirection enumprotocoldirection) {
+         this.h = enumprotocoldirection;
+     }
+@@ -78,6 +110,9 @@
+         super.channelActive(channelhandlercontext);
+         this.channel = channelhandlercontext.channel();
+         this.l = this.channel.remoteAddress();
++        // Spigot Start
++        this.preparing = false;
++        // Spigot End
+ 
+         try {
+             this.a(EnumProtocol.HANDSHAKING);
+@@ -107,6 +142,7 @@
+         }
+ 
+         this.close(chatmessage);
++        if (MinecraftServer.getServer().isDebugging()) throwable.printStackTrace(); // Spigot
+     }
+ 
+     protected void a(ChannelHandlerContext channelhandlercontext, Packet packet) throws Exception {
+@@ -129,7 +165,7 @@
+     public void handle(Packet packet) {
+         if (this.g()) {
+             this.m();
+-            this.a(packet, (GenericFutureListener[]) null);
++            this.a(packet, (GenericFutureListener[]) null, !PaperSpigotConfig.forceConditionalAutoFlush || this.canFlush /* KigPaper */);
+         } else {
+             this.j.writeLock().lock();
+ 
+@@ -145,7 +181,7 @@
+     public void a(Packet packet, GenericFutureListener<? extends Future<? super Void>> genericfuturelistener, GenericFutureListener<? extends Future<? super Void>>... agenericfuturelistener) {
+         if (this.g()) {
+             this.m();
+-            this.a(packet, (GenericFutureListener[]) ArrayUtils.add(agenericfuturelistener, 0, genericfuturelistener));
++            this.a(packet, (GenericFutureListener[]) ArrayUtils.add(agenericfuturelistener, 0, genericfuturelistener), true /* KigPaper */);
+         } else {
+             this.j.writeLock().lock();
+ 
+@@ -158,10 +194,15 @@
+ 
+     }
+ 
+-    private void a(final Packet packet, final GenericFutureListener<? extends Future<? super Void>>[] agenericfuturelistener) {
++    private void a(final Packet packet, final GenericFutureListener<? extends Future<? super Void>>[] agenericfuturelistener, boolean flush /* KigPaper */) {
+         final EnumProtocol enumprotocol = EnumProtocol.a(packet);
+         final EnumProtocol enumprotocol1 = (EnumProtocol) this.channel.attr(NetworkManager.c).get();
+ 
++        // KigPaper start
++        packetWrites.getAndIncrement();
++        boolean doFlush = (flush || packet instanceof PacketPlayOutKeepAlive || packet instanceof PacketPlayOutKickDisconnect || packet instanceof PacketLoginOutDisconnect);
++        // KigPaper end
++
+         if (enumprotocol1 != enumprotocol) {
+             NetworkManager.g.debug("Disabled auto read");
+             this.channel.config().setAutoRead(false);
+@@ -172,7 +213,8 @@
+                 this.a(enumprotocol);
+             }
+ 
+-            ChannelFuture channelfuture = this.channel.writeAndFlush(packet);
++            //ChannelFuture channelfuture = this.channel.writeAndFlush(packet); // KigPaper
++            ChannelFuture channelfuture = doFlush ? this.channel.writeAndFlush(packet) : this.channel.write(packet);
+ 
+             if (agenericfuturelistener != null) {
+                 channelfuture.addListeners(agenericfuturelistener);
+@@ -180,8 +222,9 @@
+ 
+             channelfuture.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+         } else {
+-            this.channel.eventLoop().execute(new Runnable() {
+-                public void run() {
++            // KigPaper start - only wakeup when flushing
++            if(doFlush) {
++                this.channel.eventLoop().execute(() -> {
+                     if (enumprotocol != enumprotocol1) {
+                         NetworkManager.this.a(enumprotocol);
+                     }
+@@ -193,22 +236,49 @@
+                     }
+ 
+                     channelfuture.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
+-                }
+-            });
+-        }
++                });
++            } else {
++                this.channel.eventLoop().execute((AbstractEventExecutor.LazyRunnable) () -> {
++                    if (enumprotocol != enumprotocol1) {
++                        NetworkManager.this.a(enumprotocol);
++                    }
++
++                    ChannelFuture channelfuture = NetworkManager.this.channel.write(packet);
++
++                    if (agenericfuturelistener != null) {
++                        channelfuture.addListeners(agenericfuturelistener);
++                    }
+ 
++                    channelfuture.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
++                });
++            }
++            // KigPaper end
++        }
+     }
+ 
+     private void m() {
++        if (this.i.isEmpty()) return; // KigPaper
+         if (this.channel != null && this.channel.isOpen()) {
+             this.j.readLock().lock();
+-
++            boolean packetWritten = false; // KigPaper
+             try {
++                // KigPaper start
++                Iterator<QueuedPacket> iterator = this.i.iterator();
++                while(iterator.hasNext()) {
++                    QueuedPacket packet = iterator.next();
++                    Packet raw = packet.a;
++                    if(packetWritten && this.canFlush) flush();
++                    iterator.remove();
++                    this.a(raw, packet.b, !iterator.hasNext() && this.canFlush);
++                    packetWritten = true;
++                }
++                // KigPaper end
++                /*
+                 while (!this.i.isEmpty()) {
+                     NetworkManager.QueuedPacket networkmanager_queuedpacket = (NetworkManager.QueuedPacket) this.i.poll();
+ 
+                     this.a(networkmanager_queuedpacket.a, networkmanager_queuedpacket.b);
+-                }
++                }*/
+             } finally {
+                 this.j.readLock().unlock();
+             }
+@@ -230,8 +300,12 @@
+     }
+ 
+     public void close(IChatBaseComponent ichatbasecomponent) {
++        this.i.clear(); // KigPaper
++        // Spigot Start
++        this.preparing = false;
++        // Spigot End
+         if (this.channel.isOpen()) {
+-            this.channel.close().awaitUninterruptibly();
++            this.channel.close(); // We can't wait as this may be called from an event loop.
+             this.n = ichatbasecomponent;
+         }
+ 
+@@ -301,6 +375,7 @@
+                 } else if (this.getPacketListener() != null) {
+                     this.getPacketListener().a(new ChatComponentText("Disconnected"));
+                 }
++                this.i.clear(); // Free up packet queue.
+             } else {
+                 NetworkManager.g.warn("handleDisconnection() called twice");
+             }
+@@ -308,7 +383,7 @@
+         }
+     }
+ 
+-    protected void channelRead0(ChannelHandlerContext channelhandlercontext, Object object) throws Exception {
++    protected void channelRead0(ChannelHandlerContext channelhandlercontext, Packet object) throws Exception { // CraftBukkit - fix decompile error
+         this.a(channelhandlercontext, (Packet) object);
+     }
+ 
+@@ -322,4 +397,11 @@
+             this.b = agenericfuturelistener;
+         }
+     }
++
++    // Spigot Start
++    public SocketAddress getRawAddress()
++    {
++        return this.channel.remoteAddress();
++    }
++    // Spigot End
+ }

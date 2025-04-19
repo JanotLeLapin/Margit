@@ -1,0 +1,12 @@
+--- PacketPlayOutAbilities.java
++++ PacketPlayOutAbilities.java
+@@ -101,7 +101,9 @@
+         this.f = f;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

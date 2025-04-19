@@ -1,0 +1,11 @@
+--- IRecipe.java
++++ IRecipe.java
+@@ -11,4 +11,8 @@
+     ItemStack b();
+ 
+     ItemStack[] b(InventoryCrafting inventorycrafting);
++
++    org.bukkit.inventory.Recipe toBukkitRecipe(); // CraftBukkit
++
++    java.util.List<ItemStack> getIngredients(); // Spigot
+ }

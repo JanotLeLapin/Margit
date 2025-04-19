@@ -1,0 +1,11 @@
+--- MapGeneratorUtils.java
++++ MapGeneratorUtils.java
+@@ -18,7 +18,7 @@
+         while (iterator1.hasNext()) {
+             Object object = iterator1.next();
+ 
+-            map.put(object, iterator.next());
++            map.put((K) object, (V) iterator.next()); // Margit
+         }
+ 
+         if (iterator.hasNext()) {

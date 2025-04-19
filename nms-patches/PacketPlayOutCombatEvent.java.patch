@@ -1,0 +1,14 @@
+--- PacketPlayOutCombatEvent.java
++++ PacketPlayOutCombatEvent.java
+@@ -60,9 +60,11 @@
+         packetlistenerplayout.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ 
+     static class SyntheticClass_1 {
+ 

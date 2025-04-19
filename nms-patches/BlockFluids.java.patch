@@ -1,0 +1,11 @@
+--- BlockFluids.java
++++ BlockFluids.java
+@@ -154,7 +154,7 @@
+                     return true;
+                 }
+ 
+-                if (integer.intValue() <= 4) {
++                if (integer.intValue() > 0) { // PaperSpigot
+                     world.setTypeUpdate(blockposition, Blocks.COBBLESTONE.getBlockData());
+                     this.fizz(world, blockposition);
+                     return true;

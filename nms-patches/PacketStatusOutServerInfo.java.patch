@@ -1,0 +1,12 @@
+--- PacketStatusOutServerInfo.java
++++ PacketStatusOutServerInfo.java
+@@ -27,7 +27,9 @@
+         packetstatusoutlistener.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketStatusOutListener) packetlistener);
+     }
++    */
+ }

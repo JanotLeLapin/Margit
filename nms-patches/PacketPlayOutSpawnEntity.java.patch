@@ -1,0 +1,12 @@
+--- PacketPlayOutSpawnEntity.java
++++ PacketPlayOutSpawnEntity.java
+@@ -130,7 +130,9 @@
+         this.g = i;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

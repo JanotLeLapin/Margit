@@ -1,0 +1,11 @@
+--- DemoWorldServer.java
++++ DemoWorldServer.java
+@@ -6,7 +6,7 @@
+     public static final WorldSettings a = (new WorldSettings(DemoWorldServer.I, WorldSettings.EnumGamemode.SURVIVAL, true, false, WorldType.NORMAL)).a();
+ 
+     public DemoWorldServer(MinecraftServer minecraftserver, IDataManager idatamanager, WorldData worlddata, int i, MethodProfiler methodprofiler) {
+-        super(minecraftserver, idatamanager, worlddata, i, methodprofiler);
++        super(minecraftserver, idatamanager, worlddata, i, methodprofiler, null, null); // Margit
+         this.worldData.a(DemoWorldServer.a);
+     }
+ }

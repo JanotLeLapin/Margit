@@ -1,0 +1,23 @@
+--- ChatTypeAdapterFactory.java
++++ ChatTypeAdapterFactory.java
+@@ -22,17 +22,17 @@
+         if (!oclass.isEnum()) {
+             return null;
+         } else {
+-            final HashMap hashmap = Maps.newHashMap();
++            final HashMap<String, T> hashmap = Maps.newHashMap(); // Margit
+             Object[] aobject = oclass.getEnumConstants();
+             int i = aobject.length;
+ 
+             for (int j = 0; j < i; ++j) {
+                 Object object = aobject[j];
+ 
+-                hashmap.put(this.a(object), object);
++                hashmap.put(this.a(object), (T) object); // Margit
+             }
+ 
+-            return new TypeAdapter() {
++            return new TypeAdapter<T>() { // Margit
+                 public void write(JsonWriter jsonwriter, T t0) throws IOException {
+                     if (t0 == null) {
+                         jsonwriter.nullValue();

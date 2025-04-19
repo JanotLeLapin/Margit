@@ -1,0 +1,54 @@
+--- PersistentCollection.java
++++ PersistentCollection.java
+@@ -2,6 +2,10 @@
+ 
+ import com.google.common.collect.Lists;
+ import com.google.common.collect.Maps;
++import org.bukkit.Bukkit;
++import org.github.paperspigot.event.ServerExceptionEvent;
++import org.github.paperspigot.exception.ServerInternalException;
++
+ import java.io.DataInputStream;
+ import java.io.DataOutput;
+ import java.io.DataOutputStream;
+@@ -18,7 +22,7 @@
+ 
+     private IDataManager b;
+     protected Map<String, PersistentBase> a = Maps.newHashMap();
+-    private List<PersistentBase> c = Lists.newArrayList();
++    public List<PersistentBase> c = Lists.newArrayList(); // Spigot
+     private Map<String, Short> d = Maps.newHashMap();
+ 
+     public PersistentCollection(IDataManager idatamanager) {
+@@ -103,6 +107,7 @@
+                 }
+             } catch (Exception exception) {
+                 exception.printStackTrace();
++                ServerInternalException.reportInternalException(exception);
+             }
+ 
+         }
+@@ -176,9 +181,23 @@
+                 }
+             } catch (Exception exception) {
+                 exception.printStackTrace();
++                ServerInternalException.reportInternalException(exception); // Paper
+             }
+ 
+             return oshort.shortValue();
+         }
+     }
++
++    // KigPaper start
++    public void removeMap(String mapId, PersistentBase map) {
++        this.c.remove(this.a.remove(mapId));
++        if(map != null) this.c.remove(map); // in case the lookup by ID failed
++        File toDelete = b.getDataFile(mapId);
++        if(toDelete != null && toDelete.exists()) {
++            if(!toDelete.delete()) {
++                MinecraftServer.LOGGER.warn("Couldn't delete file for PersistentBase of ID '" + mapId + "'");
++            }
++        }
++    }
++    // KigPaper end
+ }

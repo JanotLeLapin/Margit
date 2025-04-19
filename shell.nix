@@ -31,17 +31,11 @@
     hash = "sha256-Oa73INxTCUdvVvLpalFvPdMEG7v0Qsv9R9Y6y9Bq8x4=";
   };
 
-  margit-craft-bukkit = fetchgit {
-    url = "https://hub.spigotmc.org/stash/scm/spigot/craftbukkit.git";
-    rev = "e1ebe524a78e27f6a2829ed4574fded3779094e1";
-    hash = "sha256-Ek9CTBHwEcTs6ju+4V84zPNQyCxyl7fN3XCSIRYWiDY=";
-  };
-
   lsp = callPackage ./lsp.nix {};
 
   margit-mapped-jar = callPackage ./remap.nix { inherit margit-original-jar margit-build-data; };
   margit-decompiled-src = callPackage ./decompile.nix { inherit margit-mapped-jar margit-build-data; };
-  margit-patched-src = callPackage ./apply-patches.nix { inherit margit-decompiled-src margit-craft-bukkit; };
+  margit-patched-src = callPackage ./apply-patches.nix { inherit margit-decompiled-src; };
 
   margit-build-patches = callPackage ./build-patches.nix {};
 in mkShell {
@@ -51,8 +45,9 @@ in mkShell {
   ];
 
   shellHook = ''
-    if [ ! -d "server" ]; then
-      cp -r --no-preserve=all ${margit-patched-src}/server .
+    if [ ! -d "server/src/main/java/net/minecraft/server" ]; then
+      mkdir -p server/src/main/java/net/minecraft
+      cp -r --no-preserve=all ${margit-patched-src} server/src/main/java/net/minecraft/server
       echo "Initialized server"
     else
       echo "Skipping server initialization"

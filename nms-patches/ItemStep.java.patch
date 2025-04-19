@@ -1,0 +1,11 @@
+--- ItemStep.java
++++ ItemStep.java
+@@ -58,7 +58,7 @@
+             Comparable comparable = iblockdata.get(this.b.n());
+ 
+             if (comparable == object) {
+-                IBlockData iblockdata1 = this.c.getBlockData().set(this.b.n(), comparable);
++                IBlockData iblockdata1 = this.c.getBlockData().set((IBlockState) this.b.n(), comparable); // Margit
+ 
+                 if (world.b(this.c.a(world, blockposition, iblockdata1)) && world.setTypeAndData(blockposition, iblockdata1, 3)) {
+                     world.makeSound((double) ((float) blockposition.getX() + 0.5F), (double) ((float) blockposition.getY() + 0.5F), (double) ((float) blockposition.getZ() + 0.5F), this.c.stepSound.getPlaceSound(), (this.c.stepSound.getVolume1() + 1.0F) / 2.0F, this.c.stepSound.getVolume2() * 0.8F);

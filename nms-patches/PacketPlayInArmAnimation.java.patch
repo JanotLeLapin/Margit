@@ -1,0 +1,27 @@
+--- PacketPlayInArmAnimation.java
++++ PacketPlayInArmAnimation.java
+@@ -4,9 +4,13 @@
+ 
+ public class PacketPlayInArmAnimation implements Packet<PacketListenerPlayIn> {
+ 
++    public long timestamp; // Spigot
++
+     public PacketPlayInArmAnimation() {}
+ 
+-    public void a(PacketDataSerializer packetdataserializer) throws IOException {}
++    public void a(PacketDataSerializer packetdataserializer) throws IOException {
++        timestamp = System.currentTimeMillis(); // Spigot
++    }
+ 
+     public void b(PacketDataSerializer packetdataserializer) throws IOException {}
+ 
+@@ -14,7 +18,9 @@
+         packetlistenerplayin.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayIn) packetlistener);
+     }
++    */
+ }

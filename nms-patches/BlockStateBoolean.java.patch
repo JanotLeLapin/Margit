@@ -1,0 +1,12 @@
+--- BlockStateBoolean.java
++++ BlockStateBoolean.java
+@@ -23,7 +23,9 @@
+         return obool.toString();
+     }
+ 
++    /* Margit
+     public String a(Comparable comparable) {
+         return this.a((Boolean) comparable);
+     }
++    */
+ }

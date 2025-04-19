@@ -1,0 +1,144 @@
+--- WorldData.java
++++ WorldData.java
+@@ -1,6 +1,11 @@
+ package net.minecraft.server;
+ 
+ import java.util.concurrent.Callable;
++// CraftBukkit start
++import org.bukkit.Bukkit;
++import org.bukkit.event.weather.ThunderChangeEvent;
++import org.bukkit.event.weather.WeatherChangeEvent;
++// CraftBukkit end
+ 
+ public class WorldData {
+ 
+@@ -41,6 +46,16 @@
+     private int I;
+     private int J;
+     private GameRules K;
++    public WorldServer world; // CraftBukkit
++    // KigPaper start
++    private float spawnYaw, spawnPitch;
++    public float getSpawnYaw() {
++        return spawnYaw;
++    }
++    public float getSpawnPitch() {
++        return spawnPitch;
++    }
++    // KigPaper end
+ 
+     protected WorldData() {
+         this.c = WorldType.NORMAL;
+@@ -184,6 +199,10 @@
+             this.J = nbttagcompound.getInt("BorderWarningTime");
+         }
+ 
++        // KigPaper start
++        if (nbttagcompound.hasKey("SpawnYaw")) this.spawnYaw = nbttagcompound.getFloat("SpawnYaw");
++        if (nbttagcompound.hasKey("SpawnPitch")) this.spawnPitch = nbttagcompound.getFloat("SpawnPitch");
++        // KigPaper end
+     }
+ 
+     public WorldData(WorldSettings worldsettings, String s) {
+@@ -263,6 +282,10 @@
+         this.H = worlddata.H;
+         this.J = worlddata.J;
+         this.I = worlddata.I;
++        // KigPaper start
++        this.spawnYaw = worlddata.spawnYaw;
++        this.spawnPitch = worlddata.spawnPitch;
++        // KigPaper end
+     }
+ 
+     public NBTTagCompound a() {
+@@ -321,6 +344,10 @@
+         if (nbttagcompound1 != null) {
+             nbttagcompound.set("Player", nbttagcompound1);
+         }
++        // KigPaper start
++        nbttagcompound.setFloat("SpawnYaw", spawnYaw);
++        nbttagcompound.setFloat("SpawnPitch", spawnPitch);
++        // KigPaper end
+ 
+     }
+ 
+@@ -360,10 +387,14 @@
+         this.i = i;
+     }
+ 
+-    public void setSpawn(BlockPosition blockposition) {
++    public void setSpawn(BlockPosition blockposition, float yaw, float pitch) {
+         this.e = blockposition.getX();
+         this.f = blockposition.getY();
+         this.g = blockposition.getZ();
++        // KigPaper start
++        this.spawnYaw = yaw;
++        this.spawnPitch = pitch;
++        // KigPaper end
+     }
+ 
+     public String getName() {
+@@ -395,6 +426,18 @@
+     }
+ 
+     public void setThundering(boolean flag) {
++        // CraftBukkit start
++        org.bukkit.World world = Bukkit.getWorld(getName());
++        if (world != null) {
++            ThunderChangeEvent thunder = new ThunderChangeEvent(world, flag);
++            Bukkit.getServer().getPluginManager().callEvent(thunder);
++            if (thunder.isCancelled()) {
++                return;
++            }
++
++            setThunderDuration(0); // Will force a time reset
++        }
++        // CraftBukkit end
+         this.s = flag;
+     }
+ 
+@@ -411,6 +454,18 @@
+     }
+ 
+     public void setStorm(boolean flag) {
++        // CraftBukkit start
++        org.bukkit.World world = Bukkit.getWorld(getName());
++        if (world != null) {
++            WeatherChangeEvent weather = new WeatherChangeEvent(world, flag);
++            Bukkit.getServer().getPluginManager().callEvent(weather);
++            if (weather.isCancelled()) {
++                return;
++            }
++
++            setWeatherDuration(0); // Will force a time reset
++        }
++        // CraftBukkit end
+         this.q = flag;
+     }
+ 
+@@ -556,6 +611,12 @@
+ 
+     public void setDifficulty(EnumDifficulty enumdifficulty) {
+         this.z = enumdifficulty;
++        // CraftBukkit start
++        PacketPlayOutServerDifficulty packet = new PacketPlayOutServerDifficulty(this.getDifficulty(), this.isDifficultyLocked());
++        for (EntityPlayer player : (java.util.List<EntityPlayer>) (java.util.List) world.players) {
++            player.playerConnection.sendPacket(packet);
++        }
++        // CraftBukkit end
+     }
+ 
+     public boolean isDifficultyLocked() {
+@@ -664,4 +725,12 @@
+             }
+         });
+     }
++
++    // CraftBukkit start - Check if the name stored in NBT is the correct one
++    public void checkName( String name ) {
++        if ( !this.n.equals( name ) ) {
++            this.n = name;
++        }
++    }
++    // CraftBukkit end
+ }

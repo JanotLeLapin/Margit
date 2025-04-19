@@ -1,0 +1,88 @@
+--- ServerConnection.java
++++ ServerConnection.java
+@@ -26,6 +26,7 @@
+ import java.util.concurrent.Callable;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
++import org.github.paperspigot.PaperSpigotConfig;
+ 
+ public class ServerConnection {
+ 
+@@ -67,6 +68,16 @@
+         this.d = true;
+     }
+ 
++    // KigPaper start - Paper-0117 by Aikar
++    private final List<NetworkManager> pending = Collections.synchronizedList(Lists.newArrayList());
++    private void addPending() {
++        synchronized (pending) {
++            this.h.addAll(pending);
++            pending.clear();
++        }
++    }
++    // KigPaper end
++
+     public void a(InetAddress inetaddress, int i) throws IOException {
+         List list = this.g;
+ 
+@@ -87,15 +98,21 @@
+             this.g.add(((ServerBootstrap) ((ServerBootstrap) (new ServerBootstrap()).channel(oclass)).childHandler(new ChannelInitializer() {
+                 protected void initChannel(Channel channel) throws Exception {
+                     try {
+-                        channel.config().setOption(ChannelOption.TCP_NODELAY, Boolean.valueOf(true));
++                        channel.config().setOption(ChannelOption.TCP_NODELAY, Boolean.TRUE);
+                     } catch (ChannelException channelexception) {
+                         ;
+                     }
+-
+-                    channel.pipeline().addLast("timeout", new ReadTimeoutHandler(30)).addLast("legacy_query", new LegacyPingHandler(ServerConnection.this)).addLast("splitter", new PacketSplitter()).addLast("decoder", new PacketDecoder(EnumProtocolDirection.SERVERBOUND)).addLast("prepender", new PacketPrepender()).addLast("encoder", new PacketEncoder(EnumProtocolDirection.CLIENTBOUND));
++                    // KigPaper start
++                    try {
++                        channel.config().setOption(ChannelOption.IP_TOS, 0x18);
++                    } catch (ChannelException ex) {}
++                    if(PaperSpigotConfig.nettyReadTimeout) channel.pipeline().addLast("timeout", new ReadTimeoutHandler(30));
++                    // KigPaper end
++                    channel.pipeline().addLast("legacy_query", new LegacyPingHandler(ServerConnection.this)).addLast("splitter", new PacketSplitter()).addLast("decoder", new PacketDecoder(EnumProtocolDirection.SERVERBOUND)).addLast("prepender", new PacketPrepender()).addLast("encoder", new PacketEncoder(EnumProtocolDirection.CLIENTBOUND));
+                     NetworkManager networkmanager = new NetworkManager(EnumProtocolDirection.SERVERBOUND);
+ 
+-                    ServerConnection.this.h.add(networkmanager);
++                    //ServerConnection.this.h.add(networkmanager);
++                    pending.add(networkmanager); // KigPaper
+                     channel.pipeline().addLast("packet_handler", networkmanager);
+                     networkmanager.a((PacketListener) (new HandshakeListener(ServerConnection.this.f, networkmanager)));
+                 }
+@@ -123,6 +140,14 @@
+         List list = this.h;
+ 
+         synchronized (this.h) {
++            // Spigot Start
++            addPending(); // KigPaper
++            // This prevents players from 'gaming' the server, and strategically relogging to increase their position in the tick order
++            if ( org.spigotmc.SpigotConfig.playerShuffle > 0 && MinecraftServer.currentTick % org.spigotmc.SpigotConfig.playerShuffle == 0 )
++            {
++                Collections.shuffle( this.h );
++            }
++            // Spigot End
+             Iterator iterator = this.h.iterator();
+ 
+             while (iterator.hasNext()) {
+@@ -130,6 +155,10 @@
+ 
+                 if (!networkmanager.h()) {
+                     if (!networkmanager.g()) {
++                        // Spigot Start
++                        // Fix a race condition where a NetworkManager could be unregistered just before connection.
++                        if (networkmanager.preparing) continue;
++                        // Spigot End
+                         iterator.remove();
+                         networkmanager.l();
+                     } else {
+@@ -156,7 +185,7 @@
+                             final ChatComponentText chatcomponenttext = new ChatComponentText("Internal server error");
+ 
+                             networkmanager.a(new PacketPlayOutKickDisconnect(chatcomponenttext), new GenericFutureListener() {
+-                                public void operationComplete(Future<? super Void> future) throws Exception {
++                                public void operationComplete(Future future) throws Exception { // Margit
+                                     networkmanager.close(chatcomponenttext);
+                                 }
+                             }, new GenericFutureListener[0]);

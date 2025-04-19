@@ -1,0 +1,34 @@
+--- PacketPlayOutChat.java
++++ PacketPlayOutChat.java
+@@ -5,6 +5,7 @@
+ public class PacketPlayOutChat implements Packet<PacketListenerPlayOut> {
+ 
+     private IChatBaseComponent a;
++    public net.md_5.bungee.api.chat.BaseComponent[] components; // Spigot
+     private byte b;
+ 
+     public PacketPlayOutChat() {}
+@@ -24,7 +25,13 @@
+     }
+ 
+     public void b(PacketDataSerializer packetdataserializer) throws IOException {
+-        packetdataserializer.a(this.a);
++        // Spigot start
++        if (components != null) { // Margit
++            packetdataserializer.a(net.md_5.bungee.chat.ComponentSerializer.toString(components));
++        } else {
++            packetdataserializer.a(this.a);
++        }
++        // Spigot end
+         packetdataserializer.writeByte(this.b);
+     }
+ 
+@@ -35,8 +42,4 @@
+     public boolean b() {
+         return this.b == 1 || this.b == 2;
+     }
+-
+-    public void a(PacketListener packetlistener) {
+-        this.a((PacketListenerPlayOut) packetlistener);
+-    }
+ }

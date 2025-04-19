@@ -1,0 +1,23 @@
+--- InsensitiveStringMap.java
++++ InsensitiveStringMap.java
+@@ -47,7 +47,7 @@
+         while (iterator.hasNext()) {
+             Entry entry = (Entry) iterator.next();
+ 
+-            this.a((String) entry.getKey(), entry.getValue());
++            this.a((String) entry.getKey(), (V) entry.getValue()); // Margit
+         }
+ 
+     }
+@@ -68,7 +68,9 @@
+         return this.a.entrySet();
+     }
+ 
+-    public Object put(Object object, Object object1) {
+-        return this.a((String) object, object1);
++    // Margit start
++    public V put(String object, V object1) {
++        return this.a(object, object1);
+     }
++    // Margit end
+ }

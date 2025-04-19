@@ -1,0 +1,11 @@
+--- RegistryDefault.java
++++ RegistryDefault.java
+@@ -9,7 +9,7 @@
+     }
+ 
+     public V get(K k0) {
+-        Object object = super.get(k0);
++        V object = super.get(k0); // Margit
+ 
+         return object == null ? this.a : object;
+     }

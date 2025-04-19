@@ -1,0 +1,12 @@
+--- PacketPlayInCustomPayload.java
++++ PacketPlayInCustomPayload.java
+@@ -38,7 +38,9 @@
+         return this.b;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayIn) packetlistener);
+     }
++    */
+ }

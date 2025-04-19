@@ -1,0 +1,14 @@
+--- PacketPrepender.java
++++ PacketPrepender.java
+@@ -23,7 +23,9 @@
+         }
+     }
+ 
+-    protected void encode(ChannelHandlerContext channelhandlercontext, Object object, ByteBuf bytebuf) throws Exception {
+-        this.a(channelhandlercontext, (ByteBuf) object, bytebuf);
++    // Margit start
++    protected void encode(ChannelHandlerContext channelhandlercontext, ByteBuf object, ByteBuf bytebuf) throws Exception {
++        this.a(channelhandlercontext, object, bytebuf);
+     }
++    // Margit end
+ }

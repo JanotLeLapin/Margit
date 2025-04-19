@@ -1,0 +1,12 @@
+--- PacketPlayOutExplosion.java
++++ PacketPlayOutExplosion.java
+@@ -88,7 +88,9 @@
+         packetlistenerplayout.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

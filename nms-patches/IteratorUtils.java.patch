@@ -1,0 +1,48 @@
+--- IteratorUtils.java
++++ IteratorUtils.java
+@@ -36,11 +36,11 @@
+             arraylist.add(object);
+         }
+ 
+-        return (Object[]) arraylist.toArray(b(oclass, arraylist.size()));
++        return (T[]) arraylist.toArray(b(oclass, arraylist.size())); // Margit
+     }
+ 
+     private static <T> T[] b(Class<? super T> oclass, int i) {
+-        return (Object[]) ((Object[]) Array.newInstance(oclass, i));
++        return ((T[]) Array.newInstance(oclass, i)); // Margit
+     }
+ 
+     static class SyntheticClass_1 {    }
+@@ -140,11 +140,11 @@
+                         ++this.a;
+                     }
+ 
+-                    return (Object[]) this.d.clone();
++                    return (T[]) this.d.clone(); // Margit
+                 }
+             }
+ 
+-            public Object next() {
++            public T[] next() { // Margit
+                 return this.a();
+             }
+ 
+@@ -159,12 +159,14 @@
+         private ArrayToList() {}
+ 
+         public List<T> a(Object[] aobject) {
+-            return Arrays.asList((Object[]) aobject);
++            return Arrays.asList((T[]) aobject); // Margit
+         }
+ 
+-        public Object apply(Object object) {
+-            return this.a((Object[]) object);
++        // Margit start
++        public List<T> apply(Object[] object) {
++            return this.a(object);
+         }
++        // Margit end
+ 
+         ArrayToList(IteratorUtils.SyntheticClass_1 iteratorutils_syntheticclass_1) {
+             this();

@@ -1,0 +1,12 @@
+--- PacketPlayOutCloseWindow.java
++++ PacketPlayOutCloseWindow.java
+@@ -24,7 +24,9 @@
+         packetdataserializer.writeByte(this.a);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

@@ -1,0 +1,28 @@
+--- BlockStateList.java
++++ BlockStateList.java
+@@ -2,6 +2,7 @@
+ 
+ import com.google.common.base.Function;
+ import com.google.common.base.Joiner;
++import com.google.common.base.MoreObjects; // Margit
+ import com.google.common.base.Objects;
+ import com.google.common.collect.HashBasedTable;
+ import com.google.common.collect.ImmutableList;
+@@ -101,7 +102,7 @@
+     }
+ 
+     public String toString() {
+-        return Objects.toStringHelper(this).add("block", Block.REGISTRY.c(this.c)).add("properties", Iterables.transform(this.d, BlockStateList.b)).toString();
++        return MoreObjects.toStringHelper(this).add("block", Block.REGISTRY.c(this.c)).add("properties", Iterables.transform(this.d, BlockStateList.b)).toString(); // Margit
+     }
+ 
+     static class BlockData extends BlockDataAbstract {
+@@ -123,7 +124,7 @@
+             if (!this.b.containsKey(iblockstate)) {
+                 throw new IllegalArgumentException("Cannot get property " + iblockstate + " as it does not exist in " + this.a.P());
+             } else {
+-                return (Comparable) iblockstate.b().cast(this.b.get(iblockstate));
++                return (T) iblockstate.b().cast(this.b.get(iblockstate)); // Margit
+             }
+         }
+ 

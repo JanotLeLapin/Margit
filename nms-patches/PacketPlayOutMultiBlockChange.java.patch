@@ -1,0 +1,14 @@
+--- PacketPlayOutMultiBlockChange.java
++++ PacketPlayOutMultiBlockChange.java
+@@ -49,9 +49,11 @@
+         packetlistenerplayout.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ 
+     public class MultiBlockChangeInfo {
+ 

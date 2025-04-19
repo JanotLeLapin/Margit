@@ -1,0 +1,15 @@
+--- EntityGuardian.java
++++ EntityGuardian.java
+@@ -516,8 +516,10 @@
+             return (entityliving instanceof EntityHuman || entityliving instanceof EntitySquid) && entityliving.h(this.a) > 9.0D;
+         }
+ 
+-        public boolean apply(Object object) {
+-            return this.a((EntityLiving) object);
++        // Margit start
++        public boolean apply(EntityLiving object) {
++            return this.a(object);
+         }
++        // Margit end
+     }
+ }

@@ -1,0 +1,14 @@
+--- PacketCompressor.java
++++ PacketCompressor.java
+@@ -46,7 +46,9 @@
+         this.c = i;
+     }
+ 
+-    protected void encode(ChannelHandlerContext channelhandlercontext, Object object, ByteBuf bytebuf) throws Exception {
+-        this.a(channelhandlercontext, (ByteBuf) object, bytebuf);
++    // Margit start
++    protected void encode(ChannelHandlerContext channelhandlercontext, ByteBuf object, ByteBuf bytebuf) throws Exception {
++        this.a(channelhandlercontext, object, bytebuf);
+     }
++    // Margit end
+ }

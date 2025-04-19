@@ -1,0 +1,274 @@
+--- EntityArrow.java
++++ EntityArrow.java
+@@ -1,7 +1,19 @@
+ package net.minecraft.server;
+ 
++import dev.rocco.kig.paper.api.event.PlayerCheckCriticalEvent;
++import dev.rocco.kig.paper.api.event.ProjectileCollideEvent;
++import dev.rocco.kig.paper.api.particle.ProjectileEffect;
++import org.bukkit.Location;
++import org.bukkit.entity.LivingEntity;
++import org.bukkit.entity.Player;
++import org.bukkit.event.entity.EntityCombustByEntityEvent;
++import org.bukkit.event.player.PlayerPickupItemEvent;
++
+ import java.util.List;
+ 
++// CraftBukkit start
++// CraftBukkit end
++
+ public class EntityArrow extends Entity implements IProjectile {
+ 
+     private int d = -1;
+@@ -9,7 +21,7 @@
+     private int f = -1;
+     private Block g;
+     private int h;
+-    private boolean inGround;
++    public boolean inGround = false; // Spigot - private -> public
+     public int fromPlayer;
+     public int shake;
+     public Entity shooter;
+@@ -17,6 +29,39 @@
+     private int as;
+     private double damage = 2.0D;
+     public int knockbackStrength;
++    // KigPaper start
++    private boolean critDamage, shouldDisplayCrit = true;
++    private ProjectileEffect trailEffect;
++
++    public ProjectileEffect getTrailEffect() {
++        return trailEffect;
++    }
++
++    public void setTrailEffect(ProjectileEffect trailEffect) {
++        this.trailEffect = trailEffect;
++    }
++
++    public void setShouldDisplayCrit(boolean shouldDisplayCrit) {
++        this.shouldDisplayCrit = shouldDisplayCrit;
++        setCriticalData(shouldDisplayCrit);
++    }
++
++    public boolean shouldDisplayCrit() {
++        return shouldDisplayCrit;
++    }
++    // KigPaper end
++
++    // Spigot Start
++    @Override
++    public void inactiveTick()
++    {
++        if ( this.inGround )
++        {
++            this.ar += 1; // Despawn counter. First int after shooter
++        }
++        super.inactiveTick();
++    }
++    // Spigot End
+ 
+     public EntityArrow(World world) {
+         super(world);
+@@ -35,6 +80,7 @@
+         super(world);
+         this.j = 10.0D;
+         this.shooter = entityliving;
++        this.projectileSource = (LivingEntity) entityliving.getBukkitEntity(); // CraftBukkit
+         if (entityliving instanceof EntityHuman) {
+             this.fromPlayer = 1;
+         }
+@@ -62,6 +108,7 @@
+         super(world);
+         this.j = 10.0D;
+         this.shooter = entityliving;
++        this.projectileSource = (LivingEntity) entityliving.getBukkitEntity(); // CraftBukkit
+         if (entityliving instanceof EntityHuman) {
+             this.fromPlayer = 1;
+         }
+@@ -135,7 +182,7 @@
+ 
+             if (block == this.g && i == this.h) {
+                 ++this.ar;
+-                if (this.ar >= 1200) {
++                if (this.ar >= world.spigotConfig.arrowDespawnRate) { // Spigot - First int after shooter
+                     this.die();
+                 }
+             } else {
+@@ -200,15 +247,49 @@
+             float f2;
+             float f3;
+ 
++            // PaperSpigot start - Allow arrows to fly through vanished players the shooter can't see
++            if (movingobjectposition != null && movingobjectposition.entity instanceof EntityPlayer && shooter != null && shooter instanceof EntityPlayer) {
++                Player bukkitEntity = ((EntityPlayer) shooter).getBukkitEntity();
++                if (!bukkitEntity.canSee(((EntityPlayer) movingobjectposition.entity).getBukkitEntity()) && !bukkitEntity.spigot().getCollidesWithEntities()) {
++                    movingobjectposition = null;
++                }
++            }
++            // KigPaper start - Allow arrows to fly through invisible armor stands
++            else if (movingobjectposition != null && movingobjectposition.entity instanceof EntityArmorStand && movingobjectposition.entity.isInvisible())
++                movingobjectposition = null;
++            // KigPaper end
++            // PaperSpigot end
++
++            // KigPaper start
++            if (movingobjectposition != null && movingobjectposition.entity != null) {
++                ProjectileCollideEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callProjectileCollideEvent(this, movingobjectposition.entity);
++                if (event.isCancelled()) movingobjectposition = null;
++            }
++            // KigPaper end
++
+             if (movingobjectposition != null) {
++                org.bukkit.craftbukkit.event.CraftEventFactory.callProjectileHitEvent(this); // CraftBukkit - Call event
+                 if (movingobjectposition.entity != null) {
+                     f2 = MathHelper.sqrt(this.motX * this.motX + this.motY * this.motY + this.motZ * this.motZ);
+                     int k = MathHelper.f((double) f2 * this.damage);
+ 
+-                    if (this.isCritical()) {
+-                        k += this.random.nextInt(k / 2 + 2);
++                    // KigPaper start
++                    if (shooter instanceof EntityPlayer) {
++                        PlayerCheckCriticalEvent event = new PlayerCheckCriticalEvent(
++                                ((EntityPlayer) shooter).getBukkitEntity(), movingobjectposition.entity.getBukkitEntity(),
++                                this.isCriticalDamage(), this.random.nextInt(k / 2 + 2), true);
++                        org.bukkit.Bukkit.getPluginManager().callEvent(event);
++                        if (event.isCritical()) {
++                            k += event.getDamageBonus();
++                        }
+                     }
+ 
++                    /*
++                    if (this.isCriticalDamage()) {
++                        k += this.random.nextInt(k / 2 + 2);
++                    } */ // KigPaper
++                    // KigPaper end
++
+                     DamageSource damagesource;
+ 
+                     if (this.shooter == null) {
+@@ -217,16 +298,26 @@
+                         damagesource = DamageSource.arrow(this, this.shooter);
+                     }
+ 
+-                    if (this.isBurning() && !(movingobjectposition.entity instanceof EntityEnderman)) {
+-                        movingobjectposition.entity.setOnFire(5);
++                    // CraftBukkit start - Moved damage call
++                    if (movingobjectposition.entity.damageEntity(damagesource, (float) k)) {
++                    if (this.isBurning() && !(movingobjectposition.entity instanceof EntityEnderman) && (!(movingobjectposition.entity instanceof EntityPlayer) || !(this.shooter instanceof EntityPlayer) || this.world.pvpMode)) { // CraftBukkit - abide by pvp setting if destination is a player
++                        EntityCombustByEntityEvent combustEvent = new EntityCombustByEntityEvent(this.getBukkitEntity(), entity.getBukkitEntity(), 5);
++                        org.bukkit.Bukkit.getPluginManager().callEvent(combustEvent);
++                        if (!combustEvent.isCancelled()) {
++                            movingobjectposition.entity.setOnFire(combustEvent.getDuration());
++                        }
++                        // CraftBukkit end
+                     }
+ 
+-                    if (movingobjectposition.entity.damageEntity(damagesource, (float) k)) {
++                    // if (movingobjectposition.entity.damageEntity(damagesource, (float) k)) { // CraftBukkit - moved up
+                         if (movingobjectposition.entity instanceof EntityLiving) {
+                             EntityLiving entityliving = (EntityLiving) movingobjectposition.entity;
+ 
+                             if (!this.world.isClientSide) {
+-                                entityliving.o(entityliving.bv() + 1);
++                                // KigPaper - allow entities to be "immune" to stuck arrows
++                                if(entityliving.getStickArrows()) {
++                                    entityliving.o(entityliving.bv() + 1);
++                                }
+                             }
+ 
+                             if (this.knockbackStrength > 0) {
+@@ -242,7 +333,9 @@
+                             }
+ 
+                             if (this.shooter != null && movingobjectposition.entity != this.shooter && movingobjectposition.entity instanceof EntityHuman && this.shooter instanceof EntityPlayer) {
+-                                ((EntityPlayer) this.shooter).playerConnection.sendPacket(new PacketPlayOutGameStateChange(6, 0.0F));
++                                EntityPlayer shooter = (EntityPlayer) this.shooter;
++                                shooter.p(movingobjectposition.entity); // KigPaper - set attacked entity (used for wolf pathfinding)
++                                shooter.playerConnection.sendPacket(new PacketPlayOutGameStateChange(6, 0.0F));
+                             }
+                         }
+ 
+@@ -284,12 +377,19 @@
+                     }
+                 }
+             }
+-
+             if (this.isCritical()) {
+                 for (j = 0; j < 4; ++j) {
+-                    this.world.addParticle(EnumParticle.CRIT, this.locX + this.motX * (double) j / 4.0D, this.locY + this.motY * (double) j / 4.0D, this.locZ + this.motZ * (double) j / 4.0D, -this.motX, -this.motY + 0.2D, -this.motZ, new int[0]);
++                    this.world.addParticle(EnumParticle.CRIT, this.locX + this.motX * (double) j / 4.0D, this.locY + this.motY * (double) j / 4.0D, this.locZ + this.motZ * (double) j / 4.0D, -this.motX, -this.motY + 0.2D, -this.motZ);
++                }
++            }
++            // KigPaper start - projectile trails
++            if(!this.dead && trailEffect != null && ticksLived > 1) {
++                for (j = 0; j < trailEffect.getLoopTimes(); ++j) {
++                    Location loc = new Location(bukkitEntity.getWorld(), this.locX + this.motX * (double) j / 4.0D, this.locY + this.motY * (double) j / 4.0D, this.locZ + this.motZ * (double) j / 4.0D);
++                    trailEffect.spawn(loc);
+                 }
+             }
++            // KigPaper end
+ 
+             this.locX += this.motX;
+             this.locY += this.motY;
+@@ -383,6 +483,20 @@
+ 
+     public void d(EntityHuman entityhuman) {
+         if (!this.world.isClientSide && this.inGround && this.shake <= 0) {
++            // CraftBukkit start
++            ItemStack itemstack = new ItemStack(Items.ARROW);
++            if (this.fromPlayer == 1 && entityhuman.inventory.canHold(itemstack) > 0) {
++                EntityItem item = new EntityItem(this.world, this.locX, this.locY, this.locZ, itemstack);
++
++                PlayerPickupItemEvent event = new PlayerPickupItemEvent((org.bukkit.entity.Player) entityhuman.getBukkitEntity(), new org.bukkit.craftbukkit.entity.CraftItem(this.world.getServer(), this, item), 0);
++                // event.setCancelled(!entityhuman.canPickUpLoot); TODO
++                this.world.getServer().getPluginManager().callEvent(event);
++
++                if (event.isCancelled()) {
++                    return;
++                }
++            }
++            // CraftBukkit end
+             boolean flag = this.fromPlayer == 1 || this.fromPlayer == 2 && entityhuman.abilities.canInstantlyBuild;
+ 
+             if (this.fromPlayer == 1 && !entityhuman.inventory.pickup(new ItemStack(Items.ARROW, 1))) {
+@@ -423,6 +537,19 @@
+     }
+ 
+     public void setCritical(boolean flag) {
++        this.critDamage = flag;
++        if(!flag) setCriticalData(false);
++        else if(shouldDisplayCrit) setCriticalData(true);
++    }
++
++    public boolean isCritical() {
++        byte b0 = this.datawatcher.getByte(16);
++
++        return (b0 & 1) != 0;
++    }
++
++    // KigPaper
++    private void setCriticalData(boolean flag) {
+         byte b0 = this.datawatcher.getByte(16);
+ 
+         if (flag) {
+@@ -430,12 +557,16 @@
+         } else {
+             this.datawatcher.watch(16, Byte.valueOf((byte) (b0 & -2)));
+         }
+-
+     }
+ 
+-    public boolean isCritical() {
+-        byte b0 = this.datawatcher.getByte(16);
++    public boolean isCriticalDamage() {
++        return critDamage;
++    }
++    // KigPaper end
+ 
+-        return (b0 & 1) != 0;
++    // CraftBukkit start
++    public boolean isInGround() {
++        return inGround;
+     }
++    // CraftBukkit end
+ }

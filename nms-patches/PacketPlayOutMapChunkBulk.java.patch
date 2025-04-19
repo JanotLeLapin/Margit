@@ -1,0 +1,45 @@
+--- PacketPlayOutMapChunkBulk.java
++++ PacketPlayOutMapChunkBulk.java
+@@ -9,6 +9,7 @@
+     private int[] b;
+     private PacketPlayOutMapChunk.ChunkMap[] c;
+     private boolean d;
++    private World world; // Spigot
+ 
+     public PacketPlayOutMapChunkBulk() {}
+ 
+@@ -22,13 +23,14 @@
+ 
+         for (int j = 0; j < i; ++j) {
+             Chunk chunk = (Chunk) list.get(j);
+-            PacketPlayOutMapChunk.ChunkMap packetplayoutmapchunk_chunkmap = PacketPlayOutMapChunk.a(chunk, true, this.d, '\uffff');
++            PacketPlayOutMapChunk.ChunkMap packetplayoutmapchunk_chunkmap = chunk.getChunkMap(true, '\uffff'); // PaperSpigot
+ 
+             this.a[j] = chunk.locX;
+             this.b[j] = chunk.locZ;
+             this.c[j] = packetplayoutmapchunk_chunkmap;
+         }
+-
++        
++        world = ((Chunk) list.get(0)).getWorld(); // Spigot
+     }
+ 
+     public void a(PacketDataSerializer packetdataserializer) throws IOException {
+@@ -68,6 +70,7 @@
+         }
+ 
+         for (i = 0; i < this.a.length; ++i) {
++            world.spigotConfig.antiXrayInstance.obfuscate(this.a[i], this.b[i], this.c[i].b, this.c[i].a, world); // Spigot
+             packetdataserializer.writeBytes(this.c[i].a);
+         }
+ 
+@@ -77,7 +80,9 @@
+         packetlistenerplayout.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

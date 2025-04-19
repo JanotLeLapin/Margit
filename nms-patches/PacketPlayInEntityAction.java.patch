@@ -1,0 +1,14 @@
+--- PacketPlayInEntityAction.java
++++ PacketPlayInEntityAction.java
+@@ -34,9 +34,11 @@
+         return this.c;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayIn) packetlistener);
+     }
++    */
+ 
+     public static enum EnumPlayerAction {
+ 

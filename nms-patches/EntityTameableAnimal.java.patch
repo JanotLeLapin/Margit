@@ -1,0 +1,12 @@
+--- EntityTameableAnimal.java
++++ EntityTameableAnimal.java
+@@ -165,7 +165,9 @@
+         super.die(damagesource);
+     }
+ 
++    /* Margit
+     public Entity getOwner() {
+         return this.getOwner();
+     }
++    */
+ }

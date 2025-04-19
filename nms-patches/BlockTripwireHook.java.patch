@@ -1,0 +1,43 @@
+--- BlockTripwireHook.java
++++ BlockTripwireHook.java
+@@ -1,10 +1,12 @@
+ package net.minecraft.server;
+ 
+-import com.google.common.base.Objects;
++import com.google.common.base.MoreObjects; // KigPaper
+ import com.google.common.base.Predicate;
+ import java.util.Iterator;
+ import java.util.Random;
+ 
++import org.bukkit.event.block.BlockRedstoneEvent; // CraftBukkit
++
+ public class BlockTripwireHook extends Block {
+ 
+     public static final BlockStateDirection FACING = BlockStateDirection.of("facing", (Predicate) EnumDirection.EnumDirectionLimit.HORIZONTAL);
+@@ -111,7 +113,7 @@
+                 flag5 = false;
+             } else {
+                 if (k == i) {
+-                    iblockdata2 = (IBlockData) Objects.firstNonNull(iblockdata1, iblockdata2);
++                    iblockdata2 = (IBlockData) MoreObjects.firstNonNull(iblockdata1, iblockdata2); // KigPaper
+                 }
+ 
+                 boolean flag7 = !((Boolean) iblockdata2.get(BlockTripwire.DISARMED)).booleanValue();
+@@ -141,6 +143,17 @@
+             this.a(world, blockposition1, flag5, flag6, flag2, flag3);
+         }
+ 
++        // CraftBukkit start
++        org.bukkit.block.Block block = world.getWorld().getBlockAt(blockposition.getX(), blockposition.getY(), blockposition.getZ());
++
++        BlockRedstoneEvent eventRedstone = new BlockRedstoneEvent(block, 15, 0);
++        world.getServer().getPluginManager().callEvent(eventRedstone);
++
++        if (eventRedstone.getNewCurrent() > 0) {
++            return;
++        }
++        // CraftBukkit end
++
+         this.a(world, blockposition, flag5, flag6, flag2, flag3);
+         if (!flag) {
+             world.setTypeAndData(blockposition, iblockdata3.set(BlockTripwireHook.FACING, enumdirection), 3);

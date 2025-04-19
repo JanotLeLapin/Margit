@@ -1,0 +1,59 @@
+--- ServerPing.java
++++ ServerPing.java
+@@ -102,13 +102,15 @@
+             return jsonobject;
+         }
+ 
+-        public JsonElement serialize(Object object, Type type, JsonSerializationContext jsonserializationcontext) {
+-            return this.a((ServerPing) object, type, jsonserializationcontext);
++        // Margit start
++        public JsonElement serialize(ServerPing object, Type type, JsonSerializationContext jsonserializationcontext) {
++            return this.a(object, type, jsonserializationcontext);
+         }
+ 
+-        public Object deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
++        public ServerPing deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
+             return this.a(jsonelement, type, jsondeserializationcontext);
+         }
++        // Margit end
+     }
+ 
+     public static class ServerData {
+@@ -147,13 +149,15 @@
+                 return jsonobject;
+             }
+ 
+-            public JsonElement serialize(Object object, Type type, JsonSerializationContext jsonserializationcontext) {
+-                return this.a((ServerPing.ServerData) object, type, jsonserializationcontext);
++            // Margit start
++            public JsonElement serialize(ServerPing.ServerData object, Type type, JsonSerializationContext jsonserializationcontext) {
++                return this.a(object, type, jsonserializationcontext);
+             }
+ 
+-            public Object deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
++            public ServerPing.ServerData deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
+                 return this.a(jsonelement, type, jsondeserializationcontext);
+             }
++            // Margit end
+         }
+     }
+ 
+@@ -235,13 +239,15 @@
+                 return jsonobject;
+             }
+ 
+-            public JsonElement serialize(Object object, Type type, JsonSerializationContext jsonserializationcontext) {
+-                return this.a((ServerPing.ServerPingPlayerSample) object, type, jsonserializationcontext);
++            // Margit start
++            public JsonElement serialize(ServerPing.ServerPingPlayerSample object, Type type, JsonSerializationContext jsonserializationcontext) {
++                return this.a(object, type, jsonserializationcontext);
+             }
+ 
+-            public Object deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
++            public ServerPing.ServerPingPlayerSample deserialize(JsonElement jsonelement, Type type, JsonDeserializationContext jsondeserializationcontext) throws JsonParseException {
+                 return this.a(jsonelement, type, jsondeserializationcontext);
+             }
++            // Margit end
+         }
+     }
+ }

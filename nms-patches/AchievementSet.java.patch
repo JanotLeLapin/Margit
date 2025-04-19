@@ -1,0 +1,16 @@
+--- AchievementSet.java
++++ AchievementSet.java
+@@ -45,6 +45,7 @@
+         return this.a;
+     }
+ 
++    /* Margit
+     protected Collection delegate() {
+         return this.delegate();
+     }
+@@ -52,4 +53,5 @@
+     protected Object delegate() {
+         return this.delegate();
+     }
++    */
+ }

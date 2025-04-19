@@ -1,0 +1,85 @@
+--- EntityProjectile.java
++++ EntityProjectile.java
+@@ -1,5 +1,12 @@
+ package net.minecraft.server;
+ 
++// KigPaper start
++
++import dev.rocco.kig.paper.api.event.ProjectileCollideEvent;
++import dev.rocco.kig.paper.api.particle.ProjectileEffect;
++import org.bukkit.Location;
++import org.bukkit.entity.Player;
++
+ import java.util.List;
+ import java.util.UUID;
+ 
+@@ -15,6 +22,17 @@
+     public String shooterName;
+     private int i;
+     private int ar;
++    // KigPaper start
++    private ProjectileEffect trailEffect;
++
++    public ProjectileEffect getTrailEffect() {
++        return trailEffect;
++    }
++
++    public void setTrailEffect(ProjectileEffect trailEffect) {
++        this.trailEffect = trailEffect;
++    }
++    // KigPaper end
+ 
+     public EntityProjectile(World world) {
+         super(world);
+@@ -26,6 +44,7 @@
+     public EntityProjectile(World world, EntityLiving entityliving) {
+         super(world);
+         this.shooter = entityliving;
++        this.projectileSource = (org.bukkit.entity.LivingEntity) entityliving.getBukkitEntity(); // CraftBukkit
+         this.setSize(0.25F, 0.25F);
+         this.setPositionRotation(entityliving.locX, entityliving.locY + (double) entityliving.getHeadHeight(), entityliving.locZ, entityliving.yaw, entityliving.pitch);
+         this.locX -= (double) (MathHelper.cos(this.yaw / 180.0F * 3.1415927F) * 0.16F);
+@@ -146,11 +165,43 @@
+             }
+         }
+ 
++        // PaperSpigot start - Allow projectiles to fly through vanished players the shooter can't see
++        if (movingobjectposition != null && movingobjectposition.entity instanceof EntityPlayer && shooter != null && shooter instanceof EntityPlayer) {
++            Player bukkitEntity = ((EntityPlayer) shooter).getBukkitEntity();
++            if (!bukkitEntity.canSee(((EntityPlayer) movingobjectposition.entity).getBukkitEntity()) && !bukkitEntity.spigot().getCollidesWithEntities()) {
++                movingobjectposition = null;
++            }
++        }
++        // KigPaper start - Allow arrows to fly through invisible armor stands
++        else if (movingobjectposition != null && movingobjectposition.entity instanceof EntityArmorStand && movingobjectposition.entity.isInvisible())
++            movingobjectposition = null;
++        // KigPaper end
++        // PaperSpigot end
++
++        // KigPaper start
++        if (movingobjectposition != null && movingobjectposition.entity != null) {
++            ProjectileCollideEvent event = org.bukkit.craftbukkit.event.CraftEventFactory.callProjectileCollideEvent(this, movingobjectposition.entity);
++            if (event.isCancelled()) movingobjectposition = null;
++        }
++        // KigPaper end
++
+         if (movingobjectposition != null) {
+             if (movingobjectposition.type == MovingObjectPosition.EnumMovingObjectType.BLOCK && this.world.getType(movingobjectposition.a()).getBlock() == Blocks.PORTAL) {
+                 this.d(movingobjectposition.a());
+             } else {
+                 this.a(movingobjectposition);
++                // CraftBukkit start
++                if (this.dead) {
++                    org.bukkit.craftbukkit.event.CraftEventFactory.callProjectileHitEvent(this);
++                }
++                // CraftBukkit end
++            }
++        }
++
++        if(trailEffect != null && ticksLived > 1) {
++            for (j = 0; j < trailEffect.getLoopTimes(); ++j) {
++                Location loc = new Location(bukkitEntity.getWorld(), this.locX + this.motX * j / 4.0D, this.locY + this.motY * j / 4.0D, this.locZ + this.motZ * j / 4.0D);
++                trailEffect.spawn(loc);
+             }
+         }
+ 

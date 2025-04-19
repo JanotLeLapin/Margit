@@ -1,0 +1,25 @@
+--- PacketLoginInEncryptionBegin.java
++++ PacketLoginInEncryptionBegin.java
+@@ -12,8 +12,10 @@
+     public PacketLoginInEncryptionBegin() {}
+ 
+     public void a(PacketDataSerializer packetdataserializer) throws IOException {
+-        this.a = packetdataserializer.a();
+-        this.b = packetdataserializer.a();
++        // Paper start
++        this.a = packetdataserializer.readByteArray(256);
++        this.b = packetdataserializer.readByteArray(256);
++        // Paper end
+     }
+ 
+     public void b(PacketDataSerializer packetdataserializer) throws IOException {
+@@ -33,7 +35,9 @@
+         return privatekey == null ? this.b : MinecraftEncryption.b(privatekey, this.b);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketLoginInListener) packetlistener);
+     }
++    */
+ }

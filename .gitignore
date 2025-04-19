@@ -1,9 +1,6 @@
 .gradle/
 build/
 
-# workspace
-server/
-
 # lsp
 .jdtls/
 .project

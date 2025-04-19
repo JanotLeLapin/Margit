@@ -1,0 +1,32 @@
+--- EntityItemFrame.java
++++ EntityItemFrame.java
+@@ -1,5 +1,8 @@
+ package net.minecraft.server;
+ 
++import java.util.UUID;
++import org.apache.commons.codec.Charsets;
++
+ public class EntityItemFrame extends EntityHanging {
+ 
+     private float c = 1.0F;
+@@ -27,6 +30,11 @@
+             return false;
+         } else if (!damagesource.isExplosion() && this.getItem() != null) {
+             if (!this.world.isClientSide) {
++                // CraftBukkit start - fire EntityDamageEvent
++                if (org.bukkit.craftbukkit.event.CraftEventFactory.handleNonLivingEntityDamageEvent(this, damagesource, f, false) || this.dead) {
++                    return true;
++                }
++                // CraftBukkit end
+                 this.a(damagesource.getEntity(), false);
+                 this.setItem((ItemStack) null);
+             }
+@@ -80,7 +88,7 @@
+             if (itemstack.getItem() == Items.FILLED_MAP) {
+                 WorldMap worldmap = ((ItemWorldMap) itemstack.getItem()).getSavedMap(itemstack, this.world);
+ 
+-                worldmap.decorations.remove("frame-" + this.getId());
++                worldmap.decorations.remove(UUID.nameUUIDFromBytes(("frame-" + this.getId()).getBytes(Charsets.US_ASCII))); // Spigot
+             }
+ 
+             itemstack.a((EntityItemFrame) null);

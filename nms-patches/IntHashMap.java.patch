@@ -1,0 +1,20 @@
+--- IntHashMap.java
++++ IntHashMap.java
+@@ -23,7 +23,7 @@
+ 
+         for (IntHashMap.IntHashMapEntry inthashmap_inthashmapentry = this.a[a(j, this.a.length)]; inthashmap_inthashmapentry != null; inthashmap_inthashmapentry = inthashmap_inthashmapentry.c) {
+             if (inthashmap_inthashmapentry.a == i) {
+-                return inthashmap_inthashmapentry.b;
++                return (V) inthashmap_inthashmapentry.b; // Margit
+             }
+         }
+ 
+@@ -103,7 +103,7 @@
+     public V d(int i) {
+         IntHashMap.IntHashMapEntry inthashmap_inthashmapentry = this.e(i);
+ 
+-        return inthashmap_inthashmapentry == null ? null : inthashmap_inthashmapentry.b;
++        return inthashmap_inthashmapentry == null ? null : (V) inthashmap_inthashmapentry.b; // Margit
+     }
+ 
+     final IntHashMap.IntHashMapEntry<V> e(int i) {

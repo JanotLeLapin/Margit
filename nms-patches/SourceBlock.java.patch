@@ -1,0 +1,10 @@
+--- SourceBlock.java
++++ SourceBlock.java
+@@ -37,6 +37,6 @@
+     }
+ 
+     public <T extends TileEntity> T getTileEntity() {
+-        return this.a.getTileEntity(this.b);
++        return (T) this.a.getTileEntity(this.b); // Margit
+     }
+ }

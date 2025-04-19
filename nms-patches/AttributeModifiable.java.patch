@@ -1,0 +1,11 @@
+--- AttributeModifiable.java
++++ AttributeModifiable.java
+@@ -72,7 +72,7 @@
+         if (this.a(attributemodifier.a()) != null) {
+             throw new IllegalArgumentException("Modifier is already applied on this attribute!");
+         } else {
+-            Object object = (Set) this.d.get(attributemodifier.b());
++            Set object = this.d.get(attributemodifier.b()); // Margit
+ 
+             if (object == null) {
+                 object = Sets.newHashSet();

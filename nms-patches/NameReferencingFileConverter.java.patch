@@ -1,0 +1,111 @@
+--- NameReferencingFileConverter.java
++++ NameReferencingFileConverter.java
+@@ -25,6 +25,9 @@
+ import java.util.UUID;
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
++import org.bukkit.Bukkit;
++import org.github.paperspigot.event.ServerExceptionEvent;
++import org.github.paperspigot.exception.ServerInternalException;
+ 
+ public class NameReferencingFileConverter {
+ 
+@@ -63,7 +66,7 @@
+             }
+         }), String.class);
+ 
+-        if (minecraftserver.getOnlineMode()) {
++        if (minecraftserver.getOnlineMode() || org.spigotmc.SpigotConfig.bungee) { // Spigot: bungee = online mode, for now.
+             minecraftserver.getGameProfileRepository().findProfilesByNames(astring, Agent.MINECRAFT, profilelookupcallback);
+         } else {
+             String[] astring1 = astring;
+@@ -87,8 +90,9 @@
+             if (gameprofilebanlist.c().exists()) {
+                 try {
+                     gameprofilebanlist.load();
+-                } catch (FileNotFoundException filenotfoundexception) {
+-                    NameReferencingFileConverter.e.warn("Could not load existing file " + gameprofilebanlist.c().getName(), filenotfoundexception);
++                // CraftBukkit start - FileNotFoundException -> IOException, don't print stacetrace
++                } catch (IOException filenotfoundexception) {
++                    NameReferencingFileConverter.e.warn("Could not load existing file " + gameprofilebanlist.c().getName());
+                 }
+             }
+ 
+@@ -145,8 +149,9 @@
+             if (ipbanlist.c().exists()) {
+                 try {
+                     ipbanlist.load();
+-                } catch (FileNotFoundException filenotfoundexception) {
+-                    NameReferencingFileConverter.e.warn("Could not load existing file " + ipbanlist.c().getName(), filenotfoundexception);
++                // CraftBukkit start - FileNotFoundException -> IOException, don't print stacetrace
++                } catch (IOException filenotfoundexception) {
++                    NameReferencingFileConverter.e.warn("Could not load existing file " + ipbanlist.c().getName());
+                 }
+             }
+ 
+@@ -186,8 +191,9 @@
+             if (oplist.c().exists()) {
+                 try {
+                     oplist.load();
+-                } catch (FileNotFoundException filenotfoundexception) {
+-                    NameReferencingFileConverter.e.warn("Could not load existing file " + oplist.c().getName(), filenotfoundexception);
++                // CraftBukkit start - FileNotFoundException -> IOException, don't print stacetrace
++                } catch (IOException filenotfoundexception) {
++                    NameReferencingFileConverter.e.warn("Could not load existing file " + oplist.c().getName());
+                 }
+             }
+ 
+@@ -230,8 +236,9 @@
+             if (whitelist.c().exists()) {
+                 try {
+                     whitelist.load();
+-                } catch (FileNotFoundException filenotfoundexception) {
+-                    NameReferencingFileConverter.e.warn("Could not load existing file " + whitelist.c().getName(), filenotfoundexception);
++                // CraftBukkit start - FileNotFoundException -> IOException, don't print stacetrace
++                } catch (IOException filenotfoundexception) {
++                    NameReferencingFileConverter.e.warn("Could not load existing file " + whitelist.c().getName());
+                 }
+             }
+ 
+@@ -350,6 +357,32 @@
+                         File file1 = new File(file2, s + ".dat");
+                         File file3 = new File(file, s1 + ".dat");
+ 
++                        // CraftBukkit start - Use old file name to seed lastKnownName
++                        NBTTagCompound root = null;
++
++                        try {
++                            root = NBTCompressedStreamTools.a(new java.io.FileInputStream(file1));
++                        } catch (Exception exception) {
++                            exception.printStackTrace();
++                            ServerInternalException.reportInternalException(exception); // Paper
++                        }
++
++                        if (root != null) {
++                            if (!root.hasKey("bukkit")) {
++                                root.set("bukkit", new NBTTagCompound());
++                            }
++                            NBTTagCompound data = root.getCompound("bukkit");
++                            data.setString("lastKnownName", s);
++
++                            try {
++                                NBTCompressedStreamTools.a(root, new java.io.FileOutputStream(file2));
++                            } catch (Exception exception) {
++                                exception.printStackTrace();
++                                ServerInternalException.reportInternalException(exception); // Paper
++                            }
++                        }
++                        // CraftBukkit end
++
+                         NameReferencingFileConverter.b(file);
+                         if (!file1.renameTo(file3)) {
+                             throw new NameReferencingFileConverter.FileConversionException("Could not convert file for " + s, null);
+@@ -467,7 +500,7 @@
+ 
+     private static File d(PropertyManager propertymanager) {
+         String s = propertymanager.getString("level-name", "world");
+-        File file = new File(s);
++        File file = new File(MinecraftServer.getServer().server.getWorldContainer(), s); // CraftBukkit - Respect container setting
+ 
+         return new File(file, "players");
+     }

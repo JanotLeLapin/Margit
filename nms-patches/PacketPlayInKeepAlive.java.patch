@@ -1,0 +1,12 @@
+--- PacketPlayInKeepAlive.java
++++ PacketPlayInKeepAlive.java
+@@ -24,7 +24,9 @@
+         return this.a;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayIn) packetlistener);
+     }
++    */
+ }

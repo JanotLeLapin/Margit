@@ -1,0 +1,10 @@
+--- BlockFlowerPot.java
++++ BlockFlowerPot.java
+@@ -95,6 +95,7 @@
+ 
+         if (tileentityflowerpot != null && tileentityflowerpot.b() != null) {
+             a(world, blockposition, new ItemStack(tileentityflowerpot.b(), 1, tileentityflowerpot.c()));
++            tileentityflowerpot.a( null, 0 ); // Spigot
+         }
+ 
+         super.remove(world, blockposition, iblockdata);

@@ -1,0 +1,12 @@
+--- PacketLoginOutSetCompression.java
++++ PacketLoginOutSetCompression.java
+@@ -24,7 +24,9 @@
+         packetloginoutlistener.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketLoginOutListener) packetlistener);
+     }
++    */
+ }

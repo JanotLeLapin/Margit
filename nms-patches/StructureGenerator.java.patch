@@ -1,0 +1,34 @@
+--- StructureGenerator.java
++++ StructureGenerator.java
+@@ -88,6 +88,7 @@
+     }
+ 
+     public boolean b(BlockPosition blockposition) {
++        if (this.c == null) return false; // PaperSpigot
+         this.a(this.c);
+         return this.c(blockposition) != null;
+     }
+@@ -115,6 +116,7 @@
+     }
+ 
+     public boolean a(World world, BlockPosition blockposition) {
++        if (this.c == null) return false; // PaperSpigot
+         this.a(world);
+         Iterator iterator = this.e.values().iterator();
+ 
+@@ -195,7 +197,15 @@
+ 
+     private void a(World world) {
+         if (this.d == null) {
++            // Spigot Start
++            if ( world.spigotConfig.saveStructureInfo && !this.a().equals( "Mineshaft" ) )
++            {
+             this.d = (PersistentStructure) world.a(PersistentStructure.class, this.a());
++            } else
++            {
++                this.d = new PersistentStructure( this.a() );
++            }
++            // Spigot End
+             if (this.d == null) {
+                 this.d = new PersistentStructure(this.a());
+                 world.a(this.a(), (PersistentBase) this.d);

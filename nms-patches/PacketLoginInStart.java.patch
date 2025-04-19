@@ -1,0 +1,12 @@
+--- PacketLoginInStart.java
++++ PacketLoginInStart.java
+@@ -30,7 +30,9 @@
+         return this.a;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketLoginInListener) packetlistener);
+     }
++    */
+ }

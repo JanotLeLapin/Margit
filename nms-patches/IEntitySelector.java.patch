@@ -1,0 +1,15 @@
+--- IEntitySelector.java
++++ IEntitySelector.java
+@@ -61,8 +61,10 @@
+             }
+         }
+ 
+-        public boolean apply(Object object) {
+-            return this.a((Entity) object);
++        // Margit start
++        public boolean apply(Entity object) {
++            return this.a(object);
+         }
++        // Margit end
+     }
+ }

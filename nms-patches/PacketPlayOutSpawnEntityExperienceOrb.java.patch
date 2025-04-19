@@ -1,0 +1,12 @@
+--- PacketPlayOutSpawnEntityExperienceOrb.java
++++ PacketPlayOutSpawnEntityExperienceOrb.java
+@@ -40,7 +40,9 @@
+         packetlistenerplayout.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

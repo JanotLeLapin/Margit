@@ -1,0 +1,141 @@
+--- PlayerSelector.java
++++ PlayerSelector.java
+@@ -32,7 +32,7 @@
+     public static <T extends Entity> T getEntity(ICommandListener icommandlistener, String s, Class<? extends T> oclass) {
+         List list = getPlayers(icommandlistener, s, oclass);
+ 
+-        return list.size() == 1 ? (Entity) list.get(0) : null;
++        return list.size() == 1 ? (T) list.get(0) : null; // Margit
+     }
+ 
+     public static IChatBaseComponent getPlayerNames(ICommandListener icommandlistener, String s) {
+@@ -50,7 +50,7 @@
+                 arraylist.add(entity.getScoreboardDisplayName());
+             }
+ 
+-            return CommandAbstract.a((List) arraylist);
++            return CommandAbstract.a((List<IChatBaseComponent>) arraylist); // Margit
+         }
+     }
+ 
+@@ -123,7 +123,7 @@
+ 
+     private static List<Predicate<Entity>> a(Map<String, String> map, String s) {
+         ArrayList arraylist = Lists.newArrayList();
+-        final String s1 = b(map, "type");
++        String s1 = b(map, "type"); // Margit
+         final boolean flag = s1 != null && s1.startsWith("!");
+ 
+         if (flag) {
+@@ -213,13 +213,15 @@
+ 
+     private static List<Predicate<Entity>> d(Map<String, String> map) {
+         ArrayList arraylist = Lists.newArrayList();
+-        final String s = b(map, "team");
++        String s = b(map, "team"); // Margit
+         final boolean flag = s != null && s.startsWith("!");
+ 
+         if (flag) {
+             s = s.substring(1);
+         }
+ 
++        final String str = s; // Margit
++
+         if (s != null) {
+             arraylist.add(new Predicate() {
+                 public boolean a(Entity entity) {
+@@ -230,7 +232,7 @@
+                         ScoreboardTeamBase scoreboardteambase = entityliving.getScoreboardTeam();
+                         String s = scoreboardteambase == null ? "" : scoreboardteambase.getName();
+ 
+-                        return s.equals(s1) != flag;
++                        return s.equals(str) != flag; // Margit
+                     }
+                 }
+ 
+@@ -305,17 +307,19 @@
+ 
+     private static List<Predicate<Entity>> f(Map<String, String> map) {
+         ArrayList arraylist = Lists.newArrayList();
+-        final String s = b(map, "name");
++        String s = b(map, "name");
+         final boolean flag = s != null && s.startsWith("!");
+ 
+         if (flag) {
+             s = s.substring(1);
+         }
+ 
++        final String str = s;
++
+         if (s != null) {
+             arraylist.add(new Predicate() {
+                 public boolean a(Entity entity) {
+-                    return entity.getName().equals(s) != flag;
++                    return entity.getName().equals(str) != flag;
+                 }
+ 
+                 public boolean apply(Object object) {
+@@ -340,7 +344,7 @@
+                 public boolean a(Entity entity) {
+                     int i = (int) entity.c(blockposition);
+ 
+-                    return (j < 0 || i >= k) && (l < 0 || i <= i1);
++                    return (j < 0 || i >= k) && (l < 0 || i <= l); // Margit
+                 }
+ 
+                 public boolean apply(Object object) {
+@@ -354,17 +358,21 @@
+ 
+     private static List<Predicate<Entity>> g(Map<String, String> map) {
+         ArrayList arraylist = Lists.newArrayList();
++        /* Margit
+         final int i;
+         final int j;
++        */
+ 
+         if (map.containsKey("rym") || map.containsKey("ry")) {
+-            i = a(a(map, "rym", 0));
+-            j = a(a(map, "ry", 359));
++            // Margit start
++            final int i = a(a(map, "rym", 0));
++            final int j = a(a(map, "ry", 359));
++            // Margit end
+             arraylist.add(new Predicate() {
+                 public boolean a(Entity entity) {
+-                    int i = PlayerSelector.a((int) Math.floor((double) entity.yaw));
++                    int k = PlayerSelector.a((int) Math.floor((double) entity.yaw));
+ 
+-                    return j > k ? i >= j || i <= k : i >= j && i <= k;
++                    return j > i ? k >= j || k <= i : k >= j && k <= i; // Margit
+                 }
+ 
+                 public boolean apply(Object object) {
+@@ -374,13 +382,15 @@
+         }
+ 
+         if (map.containsKey("rxm") || map.containsKey("rx")) {
+-            i = a(a(map, "rxm", 0));
+-            j = a(a(map, "rx", 359));
++            // Margit start
++            final int i = a(a(map, "rxm", 0));
++            final int j = a(a(map, "rx", 359));
++            // Margit end
+             arraylist.add(new Predicate() {
+                 public boolean a(Entity entity) {
+-                    int i = PlayerSelector.a((int) Math.floor((double) entity.pitch));
++                    int k = PlayerSelector.a((int) Math.floor((double) entity.pitch));
+ 
+-                    return j > k ? i >= j || i <= k : i >= j && i <= k;
++                    return j > i ? k >= j || k <= i : k >= j && k <= i; // Margit
+                 }
+ 
+                 public boolean apply(Object object) {
+@@ -478,7 +488,7 @@
+         Entity entity = icommandlistener.f();
+ 
+         if (entity != null && oclass.isAssignableFrom(entity.getClass()) && i == 1 && ((List) list).contains(entity) && !"r".equals(s)) {
+-            list = Lists.newArrayList(new Entity[] { entity});
++            list = Lists.newArrayList((T[]) new Entity[] { entity}); // Margit
+         }
+ 
+         if (i != 0) {

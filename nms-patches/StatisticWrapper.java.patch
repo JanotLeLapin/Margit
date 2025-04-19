@@ -1,0 +1,11 @@
+--- StatisticWrapper.java
++++ StatisticWrapper.java
+@@ -16,7 +16,7 @@
+     }
+ 
+     public <T extends IJsonStatistic> T b() {
+-        return this.b;
++        return (T) this.b; // Margit
+     }
+ 
+     public void a(IJsonStatistic ijsonstatistic) {

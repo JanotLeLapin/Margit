@@ -1,0 +1,14 @@
+--- PacketPlayOutPosition.java
++++ PacketPlayOutPosition.java
+@@ -47,9 +47,11 @@
+         packetlistenerplayout.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ 
+     public static enum EnumPlayerTeleportFlags {
+ 

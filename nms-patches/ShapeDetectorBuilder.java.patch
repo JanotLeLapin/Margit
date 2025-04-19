@@ -1,0 +1,11 @@
+--- ShapeDetectorBuilder.java
++++ ShapeDetectorBuilder.java
+@@ -53,7 +53,7 @@
+                         char c0 = achar[l];
+ 
+                         if (!this.c.containsKey(Character.valueOf(c0))) {
+-                            this.c.put(Character.valueOf(c0), (Object) null);
++                            this.c.put(Character.valueOf(c0), null); // Margit
+                         }
+                     }
+                 }

@@ -1,0 +1,12 @@
+--- DedicatedPlayerList.java
++++ DedicatedPlayerList.java
+@@ -146,7 +146,9 @@
+         return this.getOPs().b(gameprofile);
+     }
+ 
++    /* Margit
+     public MinecraftServer getServer() {
+         return this.getServer();
+     }
++    */
+ }

@@ -1,0 +1,11 @@
+--- IpBanList.java
++++ IpBanList.java
+@@ -23,7 +23,7 @@
+     public IpBanEntry get(SocketAddress socketaddress) {
+         String s = this.c(socketaddress);
+ 
+-        return (IpBanEntry) this.get((Object) s);
++        return (IpBanEntry) this.get(s); // Margit
+     }
+ 
+     private String c(SocketAddress socketaddress) {

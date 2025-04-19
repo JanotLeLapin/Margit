@@ -1,0 +1,14 @@
+--- PacketEncrypter.java
++++ PacketEncrypter.java
+@@ -17,7 +17,9 @@
+         this.a.a(bytebuf, bytebuf1);
+     }
+ 
+-    protected void encode(ChannelHandlerContext channelhandlercontext, Object object, ByteBuf bytebuf) throws Exception {
+-        this.a(channelhandlercontext, (ByteBuf) object, bytebuf);
++    // Margit start
++    protected void encode(ChannelHandlerContext channelhandlercontext, ByteBuf object, ByteBuf bytebuf) throws Exception {
++        this.a(channelhandlercontext, object, bytebuf);
+     }
++    // Margit end
+ }

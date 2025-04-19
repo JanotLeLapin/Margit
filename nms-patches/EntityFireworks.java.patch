@@ -1,0 +1,27 @@
+--- EntityFireworks.java
++++ EntityFireworks.java
+@@ -5,6 +5,15 @@
+     private int ticksFlown;
+     public int expectedLifespan;
+ 
++    // Spigot Start
++    @Override
++    public void inactiveTick()
++    {
++        this.ticksFlown += 1;
++        super.inactiveTick();
++    }
++    // Spigot End
++
+     public EntityFireworks(World world) {
+         super(world);
+         this.setSize(0.25F, 0.25F);
+@@ -78,7 +87,7 @@
+         }
+ 
+         if (!this.world.isClientSide && this.ticksFlown > this.expectedLifespan) {
+-            this.world.broadcastEntityEffect(this, (byte) 17);
++            if (!org.bukkit.craftbukkit.event.CraftEventFactory.callFireworkExplodeEvent(this).isCancelled()) this.world.broadcastEntityEffect(this, (byte) 17);
+             this.die();
+         }
+ 

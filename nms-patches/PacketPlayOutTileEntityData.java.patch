@@ -1,0 +1,12 @@
+--- PacketPlayOutTileEntityData.java
++++ PacketPlayOutTileEntityData.java
+@@ -32,7 +32,9 @@
+         packetlistenerplayout.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

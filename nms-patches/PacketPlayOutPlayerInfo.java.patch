@@ -1,0 +1,271 @@
+--- PacketPlayOutPlayerInfo.java
++++ PacketPlayOutPlayerInfo.java
+@@ -1,47 +1,132 @@
+ package net.minecraft.server;
+ 
+-import com.google.common.base.Objects;
++import com.google.common.base.MoreObjects; // KigPaper
+ import com.google.common.collect.Lists;
+ import com.mojang.authlib.GameProfile;
+ import com.mojang.authlib.properties.Property;
++import com.mojang.authlib.properties.PropertyMap;
++
+ import java.io.IOException;
++import java.util.Collection;
+ import java.util.Iterator;
+ import java.util.List;
++import java.util.UUID;
+ 
+ public class PacketPlayOutPlayerInfo implements Packet<PacketListenerPlayOut> {
+ 
+-    private PacketPlayOutPlayerInfo.EnumPlayerInfoAction a;
+-    private final List<PacketPlayOutPlayerInfo.PlayerInfoData> b = Lists.newArrayList();
++    private EnumPlayerInfoAction a;
++    private final List<PlayerInfoData> b = Lists.newArrayList();
+ 
+     public PacketPlayOutPlayerInfo() {}
+ 
+-    public PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction packetplayoutplayerinfo_enumplayerinfoaction, EntityPlayer... aentityplayer) {
++    // KigPaper start
++    private PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo copy) {
++        this.a = copy.a;
++        this.b.clear();
++        this.b.addAll(copy.b);
++    }
++
++    public PacketPlayOutPlayerInfo(EnumPlayerInfoAction action, EntityPlayer... players) {
++        this(null, action, players);
++    }
++
++    // KigPaper - add recipient
++    public PacketPlayOutPlayerInfo(EntityPlayer recipient, EnumPlayerInfoAction packetplayoutplayerinfo_enumplayerinfoaction, EntityPlayer... aentityplayer) {
+         this.a = packetplayoutplayerinfo_enumplayerinfoaction;
+         EntityPlayer[] aentityplayer1 = aentityplayer;
+         int i = aentityplayer.length;
+ 
+         for (int j = 0; j < i; ++j) {
++            // KigPaper - nicknames
+             EntityPlayer entityplayer = aentityplayer1[j];
+-
+-            this.b.add(new PacketPlayOutPlayerInfo.PlayerInfoData(entityplayer.getProfile(), entityplayer.ping, entityplayer.playerInteractManager.getGameMode(), entityplayer.getPlayerListName()));
++            GameProfile profile = entityplayer.getProfile();
++            if (entityplayer.isNicknamed()) {
++                // Only spoof if we're not sending the packet to the same player, see cloneFor
++                boolean spoofUUID = recipient == null || !recipient.getUniqueID().equals(entityplayer.getUniqueID());
++                PropertyMap properties = profile.getProperties();
++                // Custom property is here to use the textures from the proxy if provided
++                Collection<Property> fakeTextures = properties.get("kig-textures");
++                profile = new GameProfile(spoofUUID ? entityplayer.getNickSpoofedUUID() : entityplayer.getUniqueID(), entityplayer.getNickname());
++                if (fakeTextures == null || fakeTextures.isEmpty()) {
++                    GameProfile textures = TileEntitySkull.skinCache.getIfPresent(entityplayer.getNickname().toLowerCase());
++                    if (textures != null) profile.getProperties().putAll(textures.getProperties());
++                } else {
++                    // Only add textures property
++                    Property old = fakeTextures.iterator().next();
++                    profile.getProperties().put("textures", new Property("textures", old.getValue(), old.getSignature()));
++                }
++            }
++            this.b.add(new PlayerInfoData(profile, spoofPing(entityplayer), entityplayer.playerInteractManager.getGameMode(), entityplayer.getPlayerListName()));
+         }
+ 
+     }
++    // KigPaper end
+ 
+-    public PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction packetplayoutplayerinfo_enumplayerinfoaction, Iterable<EntityPlayer> iterable) {
++    // Only used to update ping
++    public PacketPlayOutPlayerInfo(EnumPlayerInfoAction packetplayoutplayerinfo_enumplayerinfoaction, Iterable<EntityPlayer> iterable) {
+         this.a = packetplayoutplayerinfo_enumplayerinfoaction;
+-        Iterator iterator = iterable.iterator();
++        for (EntityPlayer entityplayer : iterable) {
++            GameProfile profile = entityplayer.getProfile();
++            // KigPaper start
++            if (entityplayer.isNicknamed()) {
++                profile = new GameProfile(entityplayer.getNickSpoofedUUID(), entityplayer.getNickname());
++            }
++            // KigPaper end
++            this.b.add(new PlayerInfoData(profile, spoofPing(entityplayer), entityplayer.playerInteractManager.getGameMode(), entityplayer.getPlayerListName()));
++        }
+ 
+-        while (iterator.hasNext()) {
+-            EntityPlayer entityplayer = (EntityPlayer) iterator.next();
++    }
+ 
+-            this.b.add(new PacketPlayOutPlayerInfo.PlayerInfoData(entityplayer.getProfile(), entityplayer.ping, entityplayer.playerInteractManager.getGameMode(), entityplayer.getPlayerListName()));
++    // KigPaper start
++    /**
++     * Attempts to clone this packet to create a player-specific version for the given recipient.
++     * This is used to make sure recipients don't get the UUID-spoofed version of the packets sent about themselves.
++     * If the packet isn't modified (i.e. the user wasn't being updated) this method will not clone.
++     * @param recipient the player receiving the packet
++     * @return the packet clone, or this instance if the packet wasn't modified
++     */
++    public PacketPlayOutPlayerInfo cloneFor(EntityPlayer recipient) {
++        UUID spoofed = recipient.getNickSpoofedUUID();
++        if (spoofed == null) return this;
++        PacketPlayOutPlayerInfo clone = null;
++        for (int i = 0; i < b.size(); i++) {
++            PlayerInfoData infoData = b.get(i);
++            // If the UUID has been spoofed and we're sending to the same player, reveal it
++            if (infoData.d.getId().equals(spoofed)) {
++                clone = new PacketPlayOutPlayerInfo(this);
++                infoData = new PlayerInfoData(infoData);
++                PropertyMap properties = infoData.d.getProperties();
++                infoData.d = new GameProfile(recipient.getUniqueID(), infoData.d.getName());
++                infoData.d.getProperties().putAll(properties);
++                infoData.b = recipient.ping; // Reveal ping to self
++                clone.b.set(i, infoData);
++                break;
++            }
+         }
++        return clone == null ? this : clone;
++    }
+ 
++    private int spoofPing(EntityPlayer player) {
++        int ping = player.ping;
++        if (ping <= 0 || !player.isNicknamed()) return ping;
++        // KigPaper - spoof ping
++        // We can achieve "randomness" by adding the fixed value to the player's actual ping.
++        // The fixed value is constant for each nickname so it persists across servers.
++        long val = player.getNickSpoofedUUID().hashCode();
++        if (ping < 100) {
++            // Increase low pings
++            ping += (val % 2) * 50 + 50;
++        } else {
++            // Try to reduce pings >= 100 instead
++            // (val % 3 * 20) is guaranteed to return <= 40, so with (ping / 2) being >= 50, we never get negative pings
++            ping -= val % 3 * 20 + ping / 2;
++        }
++        return ping;
+     }
++    // KigPaper end
+ 
+     public void a(PacketDataSerializer packetdataserializer) throws IOException {
+-        this.a = (PacketPlayOutPlayerInfo.EnumPlayerInfoAction) packetdataserializer.a(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.class);
++        this.a = (EnumPlayerInfoAction) packetdataserializer.a(EnumPlayerInfoAction.class);
+         int i = packetdataserializer.e();
+ 
+         for (int j = 0; j < i; ++j) {
+@@ -50,7 +135,7 @@
+             WorldSettings.EnumGamemode worldsettings_enumgamemode = null;
+             IChatBaseComponent ichatbasecomponent = null;
+ 
+-            switch (PacketPlayOutPlayerInfo.SyntheticClass_1.a[this.a.ordinal()]) {
++            switch (SyntheticClass_1.a[this.a.ordinal()]) {
+             case 1:
+                 gameprofile = new GameProfile(packetdataserializer.g(), packetdataserializer.c(16));
+                 int l = packetdataserializer.e();
+@@ -94,7 +179,7 @@
+                 gameprofile = new GameProfile(packetdataserializer.g(), (String) null);
+             }
+ 
+-            this.b.add(new PacketPlayOutPlayerInfo.PlayerInfoData(gameprofile, k, worldsettings_enumgamemode, ichatbasecomponent));
++            this.b.add(new PlayerInfoData(gameprofile, k, worldsettings_enumgamemode, ichatbasecomponent));
+         }
+ 
+     }
+@@ -105,9 +190,9 @@
+         Iterator iterator = this.b.iterator();
+ 
+         while (iterator.hasNext()) {
+-            PacketPlayOutPlayerInfo.PlayerInfoData packetplayoutplayerinfo_playerinfodata = (PacketPlayOutPlayerInfo.PlayerInfoData) iterator.next();
++            PlayerInfoData packetplayoutplayerinfo_playerinfodata = (PlayerInfoData) iterator.next();
+ 
+-            switch (PacketPlayOutPlayerInfo.SyntheticClass_1.a[this.a.ordinal()]) {
++            switch (SyntheticClass_1.a[this.a.ordinal()]) {
+             case 1:
+                 packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getId());
+                 packetdataserializer.a(packetplayoutplayerinfo_playerinfodata.a().getName());
+@@ -169,44 +254,45 @@
+     }
+ 
+     public String toString() {
+-        return Objects.toStringHelper(this).add("action", this.a).add("entries", this.b).toString();
++        return MoreObjects.toStringHelper(this).add("action", this.a).add("entries", this.b).toString(); // KigPaper
+     }
+-
++    /* KigPaper - fix compile error
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++     */
+ 
+     static class SyntheticClass_1 {
+ 
+-        static final int[] a = new int[PacketPlayOutPlayerInfo.EnumPlayerInfoAction.values().length];
++        static final int[] a = new int[EnumPlayerInfoAction.values().length];
+ 
+         static {
+             try {
+-                PacketPlayOutPlayerInfo.SyntheticClass_1.a[PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER.ordinal()] = 1;
++                SyntheticClass_1.a[EnumPlayerInfoAction.ADD_PLAYER.ordinal()] = 1;
+             } catch (NoSuchFieldError nosuchfielderror) {
+                 ;
+             }
+ 
+             try {
+-                PacketPlayOutPlayerInfo.SyntheticClass_1.a[PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_GAME_MODE.ordinal()] = 2;
++                SyntheticClass_1.a[EnumPlayerInfoAction.UPDATE_GAME_MODE.ordinal()] = 2;
+             } catch (NoSuchFieldError nosuchfielderror1) {
+                 ;
+             }
+ 
+             try {
+-                PacketPlayOutPlayerInfo.SyntheticClass_1.a[PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_LATENCY.ordinal()] = 3;
++                SyntheticClass_1.a[EnumPlayerInfoAction.UPDATE_LATENCY.ordinal()] = 3;
+             } catch (NoSuchFieldError nosuchfielderror2) {
+                 ;
+             }
+ 
+             try {
+-                PacketPlayOutPlayerInfo.SyntheticClass_1.a[PacketPlayOutPlayerInfo.EnumPlayerInfoAction.UPDATE_DISPLAY_NAME.ordinal()] = 4;
++                SyntheticClass_1.a[EnumPlayerInfoAction.UPDATE_DISPLAY_NAME.ordinal()] = 4;
+             } catch (NoSuchFieldError nosuchfielderror3) {
+                 ;
+             }
+ 
+             try {
+-                PacketPlayOutPlayerInfo.SyntheticClass_1.a[PacketPlayOutPlayerInfo.EnumPlayerInfoAction.REMOVE_PLAYER.ordinal()] = 5;
++                SyntheticClass_1.a[EnumPlayerInfoAction.REMOVE_PLAYER.ordinal()] = 5;
+             } catch (NoSuchFieldError nosuchfielderror4) {
+                 ;
+             }
+@@ -214,11 +300,11 @@
+         }
+     }
+ 
+-    public class PlayerInfoData {
++    public class PlayerInfoData { // Don't make static - Breaks ProtocolLib
+ 
+-        private final int b;
++        private int b; // KigPaper - make not final
+         private final WorldSettings.EnumGamemode c;
+-        private final GameProfile d;
++        private GameProfile d; // KigPaper - make not final
+         private final IChatBaseComponent e;
+ 
+         public PlayerInfoData(GameProfile gameprofile, int i, WorldSettings.EnumGamemode worldsettings_enumgamemode, IChatBaseComponent ichatbasecomponent) {
+@@ -228,6 +314,15 @@
+             this.e = ichatbasecomponent;
+         }
+ 
++        // KigPaper start
++        private PlayerInfoData(PlayerInfoData copy) {
++            this.b = copy.b;
++            this.c = copy.c;
++            this.d = copy.d;
++            this.e = copy.e;
++        }
++        // KigPaper end
++
+         public GameProfile a() {
+             return this.d;
+         }
+@@ -245,7 +340,7 @@
+         }
+ 
+         public String toString() {
+-            return Objects.toStringHelper(this).add("latency", this.b).add("gameMode", this.c).add("profile", this.d).add("displayName", this.e == null ? null : IChatBaseComponent.ChatSerializer.a(this.e)).toString();
++            return MoreObjects.toStringHelper(this).add("latency", this.b).add("gameMode", this.c).add("profile", this.d).add("displayName", this.e == null ? null : IChatBaseComponent.ChatSerializer.a(this.e)).toString(); // KigPaper
+         }
+     }
+ 

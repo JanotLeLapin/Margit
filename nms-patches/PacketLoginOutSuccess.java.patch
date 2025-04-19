@@ -1,0 +1,12 @@
+--- PacketLoginOutSuccess.java
++++ PacketLoginOutSuccess.java
+@@ -33,7 +33,9 @@
+         packetloginoutlistener.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketLoginOutListener) packetlistener);
+     }
++    */
+ }

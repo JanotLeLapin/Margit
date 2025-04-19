@@ -1,0 +1,63 @@
+--- EntityOcelot.java
++++ EntityOcelot.java
+@@ -6,6 +6,7 @@
+ 
+     private PathfinderGoalAvoidTarget<EntityHuman> bo;
+     private PathfinderGoalTempt bp;
++    public boolean spawnBonus = true; // Spigot
+ 
+     public EntityOcelot(World world) {
+         super(world);
+@@ -51,7 +52,7 @@
+     }
+ 
+     protected boolean isTypeNotPersistent() {
+-        return !this.isTamed() && this.ticksLived > 2400;
++        return !this.isTamed() /*&& this.ticksLived > 2400*/; // CraftBukkit
+     }
+ 
+     protected void initAttributes() {
+@@ -96,6 +97,9 @@
+         return entity.damageEntity(DamageSource.mobAttack(this), 3.0F);
+     }
+ 
++    /* CraftBukkit start
++    // Function disabled as it has no special function anymore after
++    //   setSitting is disabled.
+     public boolean damageEntity(DamageSource damagesource, float f) {
+         if (this.isInvulnerable(damagesource)) {
+             return false;
+@@ -104,6 +108,7 @@
+             return super.damageEntity(damagesource, f);
+         }
+     }
++    // CraftBukkit end */
+ 
+     protected void dropDeathLoot(boolean flag, int i) {}
+ 
+@@ -124,7 +129,8 @@
+             }
+ 
+             if (!this.world.isClientSide) {
+-                if (this.random.nextInt(3) == 0) {
++                // CraftBukkit - added event call and isCancelled check
++                if (this.random.nextInt(3) == 0 && !org.bukkit.craftbukkit.event.CraftEventFactory.callEntityTameEvent(this, entityhuman).isCancelled()) {
+                     this.setTamed(true);
+                     this.setCatType(1 + this.world.random.nextInt(3));
+                     this.setOwnerUUID(entityhuman.getUniqueID().toString());
+@@ -225,13 +231,13 @@
+ 
+     public GroupDataEntity prepare(DifficultyDamageScaler difficultydamagescaler, GroupDataEntity groupdataentity) {
+         groupdataentity = super.prepare(difficultydamagescaler, groupdataentity);
+-        if (this.world.random.nextInt(7) == 0) {
++        if (spawnBonus && this.world.random.nextInt(7) == 0) { // Spigot
+             for (int i = 0; i < 2; ++i) {
+                 EntityOcelot entityocelot = new EntityOcelot(this.world);
+ 
+                 entityocelot.setPositionRotation(this.locX, this.locY, this.locZ, this.yaw, 0.0F);
+                 entityocelot.setAgeRaw(-24000);
+-                this.world.addEntity(entityocelot);
++                this.world.addEntity(entityocelot, org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.OCELOT_BABY); // CraftBukkit - add SpawnReason
+             }
+         }
+ 

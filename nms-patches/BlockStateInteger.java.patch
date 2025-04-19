@@ -1,0 +1,12 @@
+--- BlockStateInteger.java
++++ BlockStateInteger.java
+@@ -61,7 +61,9 @@
+         return integer.toString();
+     }
+ 
++    /* Margit
+     public String a(Comparable comparable) {
+         return this.a((Integer) comparable);
+     }
++    */
+ }

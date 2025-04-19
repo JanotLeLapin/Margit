@@ -1,0 +1,37 @@
+--- EnchantmentManager.java
++++ EnchantmentManager.java
+@@ -147,7 +147,9 @@
+         } else if (EnchantmentManager.b.a < 0) {
+             EnchantmentManager.b.a = 0;
+         }
+-
++        // KigPaper start
++        EnchantmentManager.b.b = null;
++        // KigPaper end
+         return (EnchantmentManager.b.a + 1 >> 1) + EnchantmentManager.a.nextInt((EnchantmentManager.b.a >> 1) + 1);
+     }
+ 
+@@ -168,7 +170,10 @@
+         if (entity instanceof EntityHuman) {
+             a((EnchantmentManager.EnchantmentModifier) EnchantmentManager.d, entityliving.bA());
+         }
+-
++        // KigPaper start
++        EnchantmentManager.d.a = null;
++        EnchantmentManager.d.b = null;
++        // KigPaper end
+     }
+ 
+     public static void b(EntityLiving entityliving, Entity entity) {
+@@ -181,7 +186,10 @@
+         if (entityliving instanceof EntityHuman) {
+             a((EnchantmentManager.EnchantmentModifier) EnchantmentManager.e, entityliving.bA());
+         }
+-
++        // KigPaper start
++        EnchantmentManager.e.a = null;
++        EnchantmentManager.e.b = null;
++        // KigPaper end
+     }
+ 
+     public static int a(EntityLiving entityliving) {

@@ -1,0 +1,20 @@
+--- LongHashMap.java
++++ LongHashMap.java
+@@ -35,7 +35,7 @@
+ 
+         for (LongHashMap.LongHashMapEntry longhashmap_longhashmapentry = this.entries[a(j, this.c)]; longhashmap_longhashmapentry != null; longhashmap_longhashmapentry = longhashmap_longhashmapentry.c) {
+             if (longhashmap_longhashmapentry.a == i) {
+-                return longhashmap_longhashmapentry.b;
++                return (V) longhashmap_longhashmapentry.b; // Margit
+             }
+         }
+ 
+@@ -117,7 +117,7 @@
+     public V remove(long i) {
+         LongHashMap.LongHashMapEntry longhashmap_longhashmapentry = this.e(i);
+ 
+-        return longhashmap_longhashmapentry == null ? null : longhashmap_longhashmapentry.b;
++        return longhashmap_longhashmapentry == null ? null : (V) longhashmap_longhashmapentry.b; // Margit
+     }
+ 
+     final LongHashMap.LongHashMapEntry<V> e(long i) {

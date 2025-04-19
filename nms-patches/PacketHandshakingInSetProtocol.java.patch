@@ -1,0 +1,21 @@
+--- PacketHandshakingInSetProtocol.java
++++ PacketHandshakingInSetProtocol.java
+@@ -13,7 +13,7 @@
+ 
+     public void a(PacketDataSerializer packetdataserializer) throws IOException {
+         this.a = packetdataserializer.e();
+-        this.hostname = packetdataserializer.c(255);
++        this.hostname = packetdataserializer.c(Short.MAX_VALUE); // Spigot
+         this.port = packetdataserializer.readUnsignedShort();
+         this.d = EnumProtocol.a(packetdataserializer.e());
+     }
+@@ -37,7 +37,9 @@
+         return this.a;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketHandshakingInListener) packetlistener);
+     }
++    */
+ }

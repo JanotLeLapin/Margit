@@ -1,0 +1,12 @@
+--- PacketPlayOutResourcePackSend.java
++++ PacketPlayOutResourcePackSend.java
+@@ -31,7 +31,9 @@
+         packetlistenerplayout.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

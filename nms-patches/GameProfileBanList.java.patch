@@ -1,0 +1,14 @@
+--- GameProfileBanList.java
++++ GameProfileBanList.java
+@@ -52,7 +52,9 @@
+         return (GameProfile) gameprofilebanentry.getKey();
+     }
+ 
+-    protected String a(Object object) {
+-        return this.b((GameProfile) object);
++    // Margit start
++    protected String a(GameProfile object) {
++        return this.b(object);
+     }
++    // Margit end
+ }

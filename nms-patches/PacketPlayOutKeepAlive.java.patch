@@ -1,0 +1,12 @@
+--- PacketPlayOutKeepAlive.java
++++ PacketPlayOutKeepAlive.java
+@@ -24,7 +24,9 @@
+         packetdataserializer.b(this.a);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

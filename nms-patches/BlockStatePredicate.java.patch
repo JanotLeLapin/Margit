@@ -1,0 +1,14 @@
+--- BlockStatePredicate.java
++++ BlockStatePredicate.java
+@@ -50,7 +50,9 @@
+         }
+     }
+ 
+-    public boolean apply(Object object) {
+-        return this.a((IBlockData) object);
++    // Margit start
++    public boolean apply(IBlockData object) {
++        return this.a(object);
+     }
++    // Margit end
+ }

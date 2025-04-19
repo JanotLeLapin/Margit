@@ -1,0 +1,77 @@
+--- Block.java
++++ Block.java
+@@ -65,6 +65,16 @@
+     protected boolean y;
+     protected boolean z;
+     protected boolean isTileEntity;
++    // Spigot start
++    public co.aikar.timings.Timing timing;
++    public co.aikar.timings.Timing getTiming() {
++        if (timing == null) {
++            timing = co.aikar.timings.SpigotTimings.getBlockTiming(this);
++        }
++        return timing;
++    }
++    // Spigot end
++
+     protected double minX;
+     protected double minY;
+     protected double minZ;
+@@ -309,9 +319,13 @@
+         return 10;
+     }
+ 
+-    public void onPlace(World world, BlockPosition blockposition, IBlockData iblockdata) {}
++    public void onPlace(World world, BlockPosition blockposition, IBlockData iblockdata) {
++        org.spigotmc.AsyncCatcher.catchOp( "block onPlace"); // Spigot
++    }
+ 
+-    public void remove(World world, BlockPosition blockposition, IBlockData iblockdata) {}
++    public void remove(World world, BlockPosition blockposition, IBlockData iblockdata) {
++        org.spigotmc.AsyncCatcher.catchOp( "block remove"); // Spigot
++    }
+ 
+     public int a(Random random) {
+         return 1;
+@@ -336,7 +350,8 @@
+             int j = this.getDropCount(i, world.random);
+ 
+             for (int k = 0; k < j; ++k) {
+-                if (world.random.nextFloat() <= f) {
++                // CraftBukkit - <= to < to allow for plugins to completely disable block drops from explosions
++                if (world.random.nextFloat() < f) {
+                     Item item = this.getDropType(iblockdata, world.random, i);
+ 
+                     if (item != null) {
+@@ -561,7 +576,7 @@
+ 
+     public void a(World world, EntityHuman entityhuman, BlockPosition blockposition, IBlockData iblockdata, TileEntity tileentity) {
+         entityhuman.b(StatisticList.MINE_BLOCK_COUNT[getId(this)]);
+-        entityhuman.applyExhaustion(0.025F);
++        entityhuman.applyExhaustion(world.paperSpigotConfig.blockBreakExhaustion); // PaperSpigot - Configurable block break exhaustion
+         if (this.I() && EnchantmentManager.hasSilkTouchEnchantment(entityhuman)) {
+             ItemStack itemstack = this.i(iblockdata);
+ 
+@@ -1002,4 +1017,22 @@
+             return this.getBreakSound();
+         }
+     }
++
++    // CraftBukkit start
++    public int getExpDrop(World world, IBlockData data, int enchantmentLevel) {
++        return 0;
++    }
++    // CraftBukkit end
++
++    // Spigot start
++    public static float range(float min, float value, float max) {
++        if (value < min) {
++            return min;
++        }
++        if (value > max) {
++            return max;
++        }
++        return value;
++    }
++    // Spigot end
+ }

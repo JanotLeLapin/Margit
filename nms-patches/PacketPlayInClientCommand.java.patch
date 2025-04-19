@@ -1,0 +1,14 @@
+--- PacketPlayInClientCommand.java
++++ PacketPlayInClientCommand.java
+@@ -28,9 +28,11 @@
+         return this.a;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayIn) packetlistener);
+     }
++    */
+ 
+     public static enum EnumClientCommand {
+ 

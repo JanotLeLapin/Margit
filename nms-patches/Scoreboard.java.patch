@@ -1,0 +1,20 @@
+--- Scoreboard.java
++++ Scoreboard.java
+@@ -35,7 +35,7 @@
+                 throw new IllegalArgumentException("An objective with the name \'" + s + "\' already exists!");
+             } else {
+                 scoreboardobjective = new ScoreboardObjective(this, s, iscoreboardcriteria);
+-                Object object = (List) this.objectivesByCriteria.get(iscoreboardcriteria);
++                List object = this.objectivesByCriteria.get(iscoreboardcriteria); // Margit
+ 
+                 if (object == null) {
+                     object = Lists.newArrayList();
+@@ -72,7 +72,7 @@
+         if (s.length() > 40) {
+             throw new IllegalArgumentException("The player name \'" + s + "\' is too long!");
+         } else {
+-            Object object = (Map) this.playerScores.get(s);
++            Map object = this.playerScores.get(s); // Margit
+ 
+             if (object == null) {
+                 object = Maps.newHashMap();

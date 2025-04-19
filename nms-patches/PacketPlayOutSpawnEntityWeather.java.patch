@@ -1,0 +1,12 @@
+--- PacketPlayOutSpawnEntityWeather.java
++++ PacketPlayOutSpawnEntityWeather.java
+@@ -43,7 +43,9 @@
+         packetlistenerplayout.a(this);
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

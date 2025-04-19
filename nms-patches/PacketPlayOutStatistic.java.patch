@@ -1,0 +1,12 @@
+--- PacketPlayOutStatistic.java
++++ PacketPlayOutStatistic.java
+@@ -49,7 +49,9 @@
+ 
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayOut) packetlistener);
+     }
++    */
+ }

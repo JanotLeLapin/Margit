@@ -1,0 +1,12 @@
+--- PacketPlayInWindowClick.java
++++ PacketPlayInWindowClick.java
+@@ -59,7 +59,9 @@
+         return this.shift;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayIn) packetlistener);
+     }
++    */
+ }

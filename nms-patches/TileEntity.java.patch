@@ -1,0 +1,60 @@
+--- TileEntity.java
++++ TileEntity.java
+@@ -6,8 +6,14 @@
+ import org.apache.logging.log4j.LogManager;
+ import org.apache.logging.log4j.Logger;
+ 
++import co.aikar.timings.SpigotTimings; // Spigot
++import co.aikar.timings.Timing; // Spigot
++import org.bukkit.inventory.InventoryHolder; // CraftBukkit
++import org.github.paperspigot.exception.ServerInternalException;
++
+ public abstract class TileEntity {
+ 
++    public Timing tickTimer = SpigotTimings.getTileEntityTimings(this); // Spigot
+     private static final Logger a = LogManager.getLogger();
+     private static Map<String, Class<? extends TileEntity>> f = Maps.newHashMap();
+     private static Map<Class<? extends TileEntity>, String> g = Maps.newHashMap();
+@@ -71,6 +77,7 @@
+             }
+         } catch (Exception exception) {
+             exception.printStackTrace();
++            ServerInternalException.reportInternalException(exception); // Paper
+         }
+ 
+         if (tileentity != null) {
+@@ -153,7 +160,12 @@
+             }
+         });
+         if (this.world != null) {
+-            CrashReportSystemDetails.a(crashreportsystemdetails, this.position, this.w(), this.u());
++            // PaperSpigot start - Prevent tile entity and entity crashes
++            Block block = this.w();
++            if (block != null) {
++                CrashReportSystemDetails.a(crashreportsystemdetails, this.position, this.w(), this.u());
++            }
++            // PaperSpigot end
+             crashreportsystemdetails.a("Actual block type", new Callable() {
+                 public String a() throws Exception {
+                     int i = Block.getId(TileEntity.this.world.getType(TileEntity.this.position).getBlock());
+@@ -221,4 +233,20 @@
+         a(TileEntityFlowerPot.class, "FlowerPot");
+         a(TileEntityBanner.class, "Banner");
+     }
++
++    // CraftBukkit start - add method
++    public InventoryHolder getOwner() {
++        if (world == null) return null;
++        // Spigot start
++        org.bukkit.block.Block block = world.getWorld().getBlockAt(position.getX(), position.getY(), position.getZ());
++        if (block == null) {
++            org.bukkit.Bukkit.getLogger().log(java.util.logging.Level.WARNING, "No block for owner at %s %d %d %d", new Object[]{world.getWorld(), position.getX(), position.getY(), position.getZ()});
++            return null;
++        }
++        // Spigot end
++        org.bukkit.block.BlockState state = block.getState();
++        if (state instanceof InventoryHolder) return (InventoryHolder) state;
++        return null;
++    }
++    // CraftBukkit end
+ }

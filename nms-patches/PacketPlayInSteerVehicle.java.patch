@@ -1,0 +1,12 @@
+--- PacketPlayInSteerVehicle.java
++++ PacketPlayInSteerVehicle.java
+@@ -56,7 +56,9 @@
+         return this.d;
+     }
+ 
++    /* Margit
+     public void a(PacketListener packetlistener) {
+         this.a((PacketListenerPlayIn) packetlistener);
+     }
++    */
+ }
