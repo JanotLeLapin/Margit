@@ -3,7 +3,7 @@ plugins {
     id("maven-publish")
 }
 
-group = "io.margit.api"
+group = "com.github.phoenixuhc"
 version = "1.0"
 
 repositories {

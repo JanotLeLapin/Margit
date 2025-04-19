@@ -3,6 +3,9 @@ plugins {
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
+group = "com.github.phoenixuhc"
+version = "1.0"
+
 repositories {
     mavenCentral()
     maven { url = uri("https://libraries.minecraft.net") }
